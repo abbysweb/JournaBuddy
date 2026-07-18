@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JournaBuddy - AI Research Intelligence Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="logo">
+      <span class="material-icons-round logo-icon">science</span>
+      <div>
+        <h1>JournaBuddy</h1>
+        <p class="tagline">AI Research Intelligence Platform</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" id="btnExport" style="display: none;">
+        <span class="material-icons-round">download</span> Export Report
+      </button>
+      <button class="btn btn-primary" onclick="window.location.reload()">
+        <span class="material-icons-round">add</span> New Scan
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Area -->
+  <main class="section">
+    <!-- View 1: Upload -->
+    <div id="viewUpload" class="upload-card glass-card">
+      <h2 style="margin-bottom:1rem; font-size:1.5rem;">Upload Research Paper</h2>
+      <p style="color:#94a3b8; margin-bottom: 2rem;">Initiate multi-agent BI intelligence pipeline.</p>
+      <input type="file" id="fileInput" accept="application/pdf" hidden />
+      <div class="upload-area" id="dropZone">
+        <span class="material-icons-round upload-icon">cloud_upload</span>
+        <p>Drag & drop PDF here</p>
+        <span class="upload-or">- OR -</span>
+        <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+      </div>
+    </div>
+
+    <!-- View 2: Processing (Pipeline) -->
+    <div id="viewProcessing" class="processing-card glass-card" hidden>
+      <h2>Intelligence Pipeline Active</h2>
+      <div class="file-info" style="margin-bottom: 1rem; color:#64748b;">
+        <span class="material-icons-round" style="vertical-align: middle;">description</span>
+        <span id="procFileName" style="vertical-align: middle; font-weight:500;">document.pdf</span>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+      </div>
+      <p id="progressText" style="text-align: center; font-weight: 700; margin-bottom: 1.5rem; color: #0ea5e9;">0%</p>
+
+      <div class="pipeline" id="pipelineSteps">
+        <!-- Steps will be dynamically marked active/done -->
+        <div class="pipeline-step" id="step-extraction">
+          <span class="material-icons-round">text_snippet</span>
+          <span>Metadata & Text Extraction</span>
+          <div class="step-status"></div>
+        </div>
+        <div class="pipeline-step" id="step-chunking">
+          <span class="material-icons-round">mediation</span>
+          <span>Semantic Chunking & Embedding</span>
+          <div class="step-status"></div>
+        </div>
+        <div class="pipeline-step" id="step-engines">
+          <span class="material-icons-round">settings_applications</span>
+          <span>Core Engines (Metadata, Semantic)</span>
+          <div class="step-status"></div>
+        </div>
+        <div class="pipeline-step" id="step-parallel_agents">
+          <span class="material-icons-round">psychology</span>
+          <span>Parallel AI Agents (Novelty, Citation, Method)</span>
+          <div class="step-status"></div>
+        </div>
+        <div class="pipeline-step" id="step-quality_gate">
+          <span class="material-icons-round">gavel</span>
+          <span>Consensus & Quality Judge</span>
+          <div class="step-status"></div>
+        </div>
+      </div>
+      
+      <!-- Live Terminal Log -->
+      <div class="live-terminal" id="liveTerminal">
+        <div class="terminal-header">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="terminal-title">Live Pipeline Execution</span>
+        </div>
+        <div class="terminal-body" id="terminalLog">
+          <div>> Initializing Intelligence Pipeline...</div>
+        </div>
+      </div>
+
+      <p class="processing-note">Running 10+ AI agents asynchronously. This may take 60-120 seconds.</p>
+    </div>
+
+    <!-- View 3: BI Dashboard -->
+    <div id="viewDashboard" class="dashboard-layout" hidden>
+      
+      <!-- Top KPI Bar -->
+      <div class="kpi-bar">
+        <div class="kpi-card glass-card"><div class="kpi-title">Overall Quality</div><div class="kpi-value" id="kpi-quality">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Scientific Accuracy</div><div class="kpi-value" id="kpi-accuracy">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Writing Score</div><div class="kpi-value" id="kpi-writing">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Citation Health</div><div class="kpi-value" id="kpi-citations">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Novelty</div><div class="kpi-value" id="kpi-novelty">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">AI Risk</div><div class="kpi-value" id="kpi-airisk">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Plagiarism</div><div class="kpi-value" id="kpi-plag">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Confidence</div><div class="kpi-value" id="kpi-conf">--</div></div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Radar Chart Panel -->
+        <div class="glass-card panel-radar">
+          <h3><span class="material-icons-round">radar</span> Dimension Analysis</h3>
+          <canvas id="radarChart"></canvas>
+        </div>
+
+        <!-- Reviewer Panel & Journal Readiness -->
+        <div class="glass-card panel-review">
+          <h3><span class="material-icons-round">groups</span> AI Reviewer Panel</h3>
+          <div class="reviewer-decisions" id="reviewerDecisions"></div>
+          
+          <h3 style="margin-top:2rem;"><span class="material-icons-round">workspace_premium</span> Journal Readiness</h3>
+          <div id="journalReadiness"></div>
+        </div>
+
+        <!-- Citation Analytics -->
+        <div class="glass-card panel-citations">
+          <h3><span class="material-icons-round">library_books</span> Citation Analytics</h3>
+          <div class="citation-stats" id="citationStats"></div>
+          <div id="citationList" style="margin-top:1rem; max-height:200px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- Plagiarism & Novelty -->
+        <div class="glass-card panel-novelty">
+          <h3><span class="material-icons-round">lightbulb</span> Novelty & Method</h3>
+          <div id="noveltyStats"></div>
+          <h3 style="margin-top:2rem;"><span class="material-icons-round">policy</span> Plagiarism Scan</h3>
+          <div id="plagiarismStats"></div>
+        </div>
+
+        <!-- Improvement Planner -->
+        <div class="glass-card panel-planner" style="grid-column: 1 / -1;">
+          <h3><span class="material-icons-round">build</span> Improvement Planner</h3>
+          <div class="table-wrap">
+            <table id="plannerTable">
+              <thead>
+                <tr>
+                  <th>Priority</th>
+                  <th>Issue</th>
+                  <th>Impact</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="/main.js?v=2.1"></script>
+</body>
+</html>
