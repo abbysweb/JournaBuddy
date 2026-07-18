@@ -25,7 +25,7 @@ timeout /t 10 /nobreak >nul
 
 echo.
 echo Opening the application in your default web browser...
-start http://localhost:5000
+start http://localhost:5001
 
 echo.
 echo =======================================
