@@ -5,87 +5,259 @@
   <title>JournaBuddy - AI Research Intelligence Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="report_data.js"></script>
 </head>
 <body>
 
   <!-- Top Navigation -->
-  <header class="top-nav">
-    <div class="logo">
-      <span class="material-icons-round logo-icon">science</span>
-      <div>
-        <h1>JournaBuddy</h1>
-        <p class="tagline">AI Research Intelligence Platform</p>
+  <div style="padding: 1.5rem 2.5rem 0 2.5rem; max-width: 1440px; margin: 0 auto; width: 100%;">
+    <header class="top-nav">
+      <div class="logo">
+        <h1>journabuddy</h1>
       </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-outline" id="btnExport" style="display: none;">
-        <span class="material-icons-round">download</span> Export Report
-      </button>
-      <button class="btn btn-primary" onclick="window.location.reload()">
-        <span class="material-icons-round">add</span> New Scan
-      </button>
-    </div>
-  </header>
+      <div class="header-actions" style="display: flex; gap: 0.75rem; align-items: center;">
+        <span class="nav-link" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'})">Upload</span>
+        <span class="nav-link" onclick="document.getElementById('complianceGrid').scrollIntoView({behavior:'smooth'})">Checks</span>
+        <span class="nav-link" onclick="alert('FAQ section coming soon!')">FAQ</span>
+        <span class="nav-link" style="margin-right: 1.25rem;" onclick="document.getElementById('privacyModal').style.display='flex'">Privacy</span>
+        <button class="btn btn-outline" id="btnExport" style="display: none;">
+          <span class="material-icons-round">download</span> Export Report
+        </button>
+        <button class="btn btn-primary" onclick="window.location.reload()">
+          New Scan <span class="material-icons-round" style="font-size: 16px;">arrow_forward</span>
+        </button>
+      </div>
+    </header>
+  </div>
 
   <!-- Main Application Area -->
   <main class="section">
     <!-- View 1: Upload -->
-    <div id="viewUpload" class="upload-card glass-card">
-      <h2 style="margin-bottom:1rem; font-size:1.5rem;">Upload Research Paper</h2>
-      <p style="color:#94a3b8; margin-bottom: 2rem;">Initiate multi-agent BI intelligence pipeline.</p>
+    <div id="viewUpload" class="hero-container" style="text-align: center; margin: 8vh auto 0 auto; max-width: 900px;">
+      <h2 class="hero-title">Catch every issue before<br>your reviewers do</h2>
+      <p class="hero-subtitle">Our <strong>AI manuscript checker</strong> provides instant feedback on format-level checks to prevent <strong>desk rejection</strong>. Detect structural weaknesses and missing elements in your PDF, Word, or LaTeX manuscript in minutes.</p>
+      
+      <div style="display: flex; justify-content: center; gap: 1.5rem; font-size: 0.82rem; color: #3e5048; margin-bottom: 2rem; font-weight: 500;">
+        <span style="display: flex; align-items: center; gap: 0.35rem;"><span class="material-icons-round" style="font-size: 16px; color: #3e5048;">lock</span> Files permanently deleted after processing.</span>
+        <span style="display: flex; align-items: center; gap: 0.35rem;"><span class="material-icons-round" style="font-size: 16px; color: #3e5048;">security</span> Not used for AI training.</span>
+      </div>
+
       <input type="file" id="fileInput" accept="application/pdf" hidden />
-      <div class="upload-area" id="dropZone">
-        <span class="material-icons-round upload-icon">cloud_upload</span>
-        <p>Drag & drop PDF here</p>
-        <span class="upload-or">- OR -</span>
-        <button class="btn btn-outline" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+      
+      <!-- Upload Area (shown initially) -->
+      <div class="upload-area-horizontal" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div style="display: flex; align-items: center; gap: 1.25rem; flex: 1; text-align: left;">
+          <div class="file-icon-bg">
+            <span class="material-icons-round" style="color: #2b4c3f; font-size: 26px;">description</span>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 0.25rem; font-size: 0.95rem; font-weight: 700; color: #0c1a14;">Upload your manuscript for an AI journal compliance check</h4>
+            <p style="font-size: 0.8rem; color: #4e6157; font-weight: 500;">
+              Supported formats: <span class="format-tag">PDF</span> • Max size: 200MB
+            </p>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="padding: 0.75rem 1.75rem; border-radius: 24px;" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Choose file</button>
+      </div>
+
+      <!-- File Selected View (One last step) -->
+      <div id="selectedFileArea" style="display: none; flex-direction: column; gap: 2rem; margin-bottom: 3rem;">
+        <!-- Selected File Bar -->
+        <div class="upload-area-horizontal" style="cursor: default; border-style: solid;">
+          <div style="display: flex; align-items: center; gap: 1.25rem; flex: 1; text-align: left;">
+            <div class="file-icon-bg">
+              <span class="material-icons-round" style="color: #2b4c3f; font-size: 26px;">description</span>
+            </div>
+            <div>
+              <h4 id="selectedFileName" style="margin-bottom: 0.25rem; font-size: 0.95rem; font-weight: 700; color: #0c1a14;">q1_1.pdf</h4>
+              <p id="selectedFileSize" style="font-size: 0.8rem; color: #4e6157; font-weight: 500;">1.5MB</p>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="border-radius: 24px;" onclick="document.getElementById('fileInput').click()">Change file</button>
+        </div>
+
+        <!-- One last step container -->
+        <div class="glass-card" style="margin: 0 auto; max-width: 850px; padding: 2.5rem; text-align: center; border: 1px solid rgba(43, 76, 63, 0.08); background: #ffffff; border-radius: 24px;">
+          <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 1.75rem; font-weight: 700; color: #0c1a14; margin-bottom: 1.5rem; border: none; padding: 0; justify-content: center;">One last step before exploring your results</h3>
+          
+          <!-- Columns -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; text-align: center;">
+            <div style="background: #f4f7f5; padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(43, 76, 63, 0.04); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+              <span class="material-icons-round" style="color: #2b4c3f;">mail</span>
+              <p style="font-size: 0.78rem; color: #2b4c3f; font-weight: 500; line-height: 1.4; margin: 0;">Your email will be used to send a report and one optional feedback only</p>
+            </div>
+            <div style="background: #f4f7f5; padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(43, 76, 63, 0.04); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+              <span class="material-icons-round" style="color: #2b4c3f;">delete</span>
+              <p style="font-size: 0.78rem; color: #2b4c3f; font-weight: 500; line-height: 1.4; margin: 0;">Your file is processed transiently, then auto-deleted within minutes. Reports are available for 2 hours only.</p>
+            </div>
+            <div style="background: #f4f7f5; padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(43, 76, 63, 0.04); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;">
+              <span class="material-icons-round" style="color: #2b4c3f;">security</span>
+              <p style="font-size: 0.78rem; color: #2b4c3f; font-weight: 500; line-height: 1.4; margin: 0;">No AI training with your data</p>
+            </div>
+          </div>
+
+          <!-- Email Input -->
+          <div style="position: relative; margin-bottom: 1.5rem; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <label for="emailAddressField" style="font-size: 0.75rem; color: #4e6157; font-weight: 600; display: block; margin-bottom: 0.4rem; padding-left: 0.25rem;">Your email address</label>
+            <input type="email" id="emailAddressField" value="mamuninaustria@gmail.com" style="width: 100%; padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid #cbdcd3; background: #f0f4f2; color: #0c1a14; font-size: 0.95rem; font-weight: 600; outline: none; transition: border-color 0.2s;" />
+          </div>
+
+          <button id="btnStartAnalysis" class="btn btn-primary" style="width: 100%; padding: 1rem; justify-content: center; font-size: 1rem; font-weight: 700; border-radius: 24px;">Analyze my manuscript</button>
+        </div>
+      </div>
+
+      <!-- Journal Submission Checklist Made Simple (Mockup Section 1) -->
+      <div class="glass-card" style="margin: 4rem auto; max-width: 800px; padding: 2.5rem; text-align: center; border: 1px solid rgba(43, 76, 63, 0.08); background: rgba(255, 255, 255, 0.45);">
+        <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 1.75rem; font-weight: 700; color: #0c1a14; justify-content: center; margin-bottom: 0.75rem; border: none; padding: 0;">Journal Submission Checklist Made Simple</h3>
+        <p style="color: #4e6157; font-size: 0.9rem; max-width: 650px; margin: 0 auto 1.5rem auto; line-height: 1.6;">
+          Stop second-guessing whether your manuscript is ready. Get a comprehensive journal compliance check that mirrors what editors look for during initial screening, ensuring peer review readiness with over 80 format-level checks across key categories:
+        </p>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; max-width: 700px; margin: 0 auto 1.75rem auto;">
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Language and Writing Quality</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Manuscript Structure</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Title and Abstract</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Metadata and Authors</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Citations and References</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Figures and Tables</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Acronyms</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Section Headings</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Keywords</span>
+          <span class="compliance-tag"><span class="material-icons-round">check_circle</span> Funding Statements</span>
+        </div>
+
+        <a href="#" class="nav-link" style="font-weight: 700; display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.85rem;" onclick="event.preventDefault(); document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+          See all review checks <span class="material-icons-round" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- Explore Our Tools & Guides (Mockup Section 2) -->
+      <div style="margin: 4rem auto; max-width: 850px; text-align: center;">
+        <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 2rem; font-weight: 700; color: #0c1a14; justify-content: center; margin-bottom: 2rem; border: none; padding: 0;">Explore Our Tools & Guides</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.25rem; text-align: left;">
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Manuscript Checker</h4>
+            <p>Run 80+ automated checks on your full manuscript before submission.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Abstract Checker</h4>
+            <p>Validate structure, word count, and completeness of your abstract.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Title Checker</h4>
+            <p>Check your paper title for clarity, keywords, and journal style.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Avoid Desk Rejection</h4>
+            <p>Learn why papers get rejected before peer review and how to prevent it.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Journal Guidelines Checker</h4>
+            <p>Verify your manuscript meets your target journal's requirements.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>APA Format Checker</h4>
+            <p>Validate your manuscript against APA citation and formatting rules.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>MLA Format Checker</h4>
+            <p>Check MLA style compliance for humanities papers.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>IEEE Paper Checker</h4>
+            <p>Verify IEEE formatting and reference style for engineering papers.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Vancouver Format Checker</h4>
+            <p>Check Vancouver citation style for medical and clinical papers.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Publishing Guide</h4>
+            <p>Step-by-step guide to publishing your research paper.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Submission Checklist</h4>
+            <p>Complete checklist for journal submission readiness.</p>
+          </div>
+          <div class="tool-guide-card" onclick="document.getElementById('dropZone').scrollIntoView({behavior:'smooth'});">
+            <h4>Tool Comparison</h4>
+            <p>Compare the best AI manuscript checkers in 2026.</p>
+          </div>
+          <div class="tool-guide-card" style="grid-column: 1 / -1; max-width: 270px;" id="btnLoadExampleReport">
+            <h4>See an Example Report</h4>
+            <p>View a sample report to see the 80+ checks in action.</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- View 2: Processing (Pipeline) -->
-    <div id="viewProcessing" class="processing-card glass-card" hidden>
-      <h2>Intelligence Pipeline Active</h2>
-      <div class="file-info" style="margin-bottom: 1rem; color:#64748b;">
-        <span class="material-icons-round" style="vertical-align: middle;">description</span>
-        <span id="procFileName" style="vertical-align: middle; font-weight:500;">document.pdf</span>
+    <div id="viewProcessing" class="glass-card" style="max-width: 800px; margin: 8vh auto 0 auto; padding: 2.5rem; background: #ffffff; border-radius: 24px; position: relative;" hidden>
+      <button onclick="location.reload()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; color: #4e6157; cursor: pointer;">&times;</button>
+      
+      <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 1.45rem; font-weight: 700; color: #0c1a14; margin-bottom: 1.5rem; border: none; padding: 0; text-align: left; justify-content: flex-start;">Getting your manuscript ready for analysis</h3>
+      
+      <div class="progress-container" style="height: 6px; background: rgba(0,0,0,0.05); margin-bottom: 2.5rem; border-radius: 4px; overflow: hidden;">
+        <div class="progress-bar" id="progressBar" style="width: 0%; background: #2b4c3f; height: 100%; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></div>
       </div>
 
-      <div class="progress-container">
-        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+      <!-- Info Banner -->
+      <div style="background: #fffbef; border: 1px solid #fef3c7; border-radius: 12px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start; text-align: left; margin-bottom: 2rem;">
+        <span class="material-icons-round" style="color: #d97706; font-size: 22px; margin-top: 0.1rem;">info</span>
+        <div>
+          <h4 style="margin-bottom: 0.25rem; font-size: 0.95rem; font-weight: 700; color: #0c1a14;">Good to know</h4>
+          <p style="font-size: 0.85rem; color: #4e6157; line-height: 1.45; margin: 0;">If you don't want to wait, you can safely close this page. We'll send you the results by email.</p>
+        </div>
       </div>
-      <p id="progressText" style="text-align: center; font-weight: 700; margin-bottom: 1.5rem; color: #0ea5e9;">0%</p>
 
-      <div class="pipeline" id="pipelineSteps">
-        <!-- Steps will be dynamically marked active/done -->
-        <div class="pipeline-step" id="step-extraction">
-          <span class="material-icons-round">text_snippet</span>
-          <span>Metadata & Text Extraction</span>
-          <div class="step-status"></div>
-        </div>
-        <div class="pipeline-step" id="step-chunking">
-          <span class="material-icons-round">mediation</span>
-          <span>Semantic Chunking & Embedding</span>
-          <div class="step-status"></div>
-        </div>
-        <div class="pipeline-step" id="step-engines">
-          <span class="material-icons-round">settings_applications</span>
-          <span>Core Engines (Metadata, Semantic)</span>
-          <div class="step-status"></div>
-        </div>
-        <div class="pipeline-step" id="step-parallel_agents">
-          <span class="material-icons-round">psychology</span>
-          <span>Parallel AI Agents (Novelty, Citation, Method)</span>
-          <div class="step-status"></div>
-        </div>
-        <div class="pipeline-step" id="step-quality_gate">
-          <span class="material-icons-round">gavel</span>
-          <span>Consensus & Quality Judge</span>
-          <div class="step-status"></div>
-        </div>
+      <!-- Bottom button -->
+      <div style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; font-size: 0.9rem; color: #4e6157; margin-bottom: 2rem; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 2rem; flex-wrap: wrap;">
+        <span>Want human reviewers to give you feedback?</span>
+        <button class="btn btn-outline" style="border-radius: 24px; padding: 0.5rem 1.5rem; background: #fff;" onclick="alert('Our premium human review service will be in touch!')">Click here</button>
       </div>
+
+      <!-- Detail Steps & Live Terminal Log (Collapsible) -->
+      <details style="text-align: left;">
+        <summary style="font-size: 0.85rem; font-weight: 600; color: #2b4c3f; cursor: pointer; margin-bottom: 1rem;">View detailed AI processing pipeline logs...</summary>
+        
+        <div class="file-info" style="margin-bottom: 1rem; color:#64748b; font-size: 0.85rem;">
+          <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">description</span>
+          <span id="procFileName" style="vertical-align: middle; font-weight:500;">document.pdf</span>
+          <span id="progressText" style="margin-left: 1rem; font-weight: 700; color: #2b4c3f;">0%</span>
+        </div>
+
+        <div class="pipeline" id="pipelineSteps" style="margin-bottom: 1.5rem;">
+          <div class="pipeline-step" id="step-extraction">
+            <span class="material-icons-round">text_snippet</span>
+            <span>Metadata & Text Extraction</span>
+            <div class="step-status"></div>
+          </div>
+          <div class="pipeline-step" id="step-chunking">
+            <span class="material-icons-round">mediation</span>
+            <span>Semantic Chunking & Embedding</span>
+            <div class="step-status"></div>
+          </div>
+          <div class="pipeline-step" id="step-engines">
+            <span class="material-icons-round">settings_applications</span>
+            <span>Core Engines (Metadata, Semantic)</span>
+            <div class="step-status"></div>
+          </div>
+          <div class="pipeline-step" id="step-parallel_agents">
+            <span class="material-icons-round">psychology</span>
+            <span>Parallel AI Agents (Novelty, Citation, Method)</span>
+            <div class="step-status"></div>
+          </div>
+          <div class="pipeline-step" id="step-quality_gate">
+            <span class="material-icons-round">gavel</span>
+            <span>Consensus & Quality Judge</span>
+            <div class="step-status"></div>
+          </div>
+        </div>
+      </details>
       
       <!-- Live Terminal Log -->
       <div class="live-terminal" id="liveTerminal">
@@ -111,7 +283,8 @@
         <div class="kpi-card glass-card"><div class="kpi-title">Writing Score</div><div class="kpi-value" id="kpi-writing">--</div></div>
         <div class="kpi-card glass-card"><div class="kpi-title">Citation Health</div><div class="kpi-value" id="kpi-citations">--</div></div>
         <div class="kpi-card glass-card"><div class="kpi-title">Novelty</div><div class="kpi-value" id="kpi-novelty">--</div></div>
-        <div class="kpi-card glass-card"><div class="kpi-title">AI Risk</div><div class="kpi-value" id="kpi-airisk">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">Methodology</div><div class="kpi-value" id="kpi-methodology-kpi">--</div></div>
+        <div class="kpi-card glass-card"><div class="kpi-title">AI Likelihood</div><div class="kpi-value" id="kpi-airisk">--</div></div>
         <div class="kpi-card glass-card"><div class="kpi-title">Plagiarism</div><div class="kpi-value" id="kpi-plag">--</div></div>
         <div class="kpi-card glass-card"><div class="kpi-title">Confidence</div><div class="kpi-value" id="kpi-conf">--</div></div>
       </div>
@@ -147,6 +320,40 @@
           <div id="plagiarismStats"></div>
         </div>
 
+        <!-- Manuscript Formatting & Compliance Audit -->
+        <div class="glass-card panel-provenance" style="grid-column: 1 / -1;">
+          <h3><span class="material-icons-round">fact_check</span> Manuscript Formatting & Compliance Audit</h3>
+          <p style="color: #4e6157; font-size: 0.92rem; margin-bottom: 1.5rem; line-height: 1.5;">
+            Our manuscript formatting check identifies what reviewers flag first: unresolved citations, unclear phrasing, inconsistent headings, and missing pieces, essential for PhD thesis review and postdoc manuscript preparation.
+          </p>
+          <div id="complianceGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+            <!-- Rendered dynamically via API -->
+          </div>
+        </div>
+
+        <!-- Data Provenance & Verification Lineage -->
+        <div class="glass-card panel-provenance" style="grid-column: 1 / -1;">
+          <h3><span class="material-icons-round">account_tree</span> Data Provenance & Verification Lineage</h3>
+          <div class="provenance-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+            <div class="provenance-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 1.25rem; border-radius: 10px;">
+              <h4 style="color: #38bdf8; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 600;">Crossref Metadata API</h4>
+              <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">Verifies bibliography items directly against Crossref's official registry to calculate citation health & coverage percent.</p>
+            </div>
+            <div class="provenance-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 1.25rem; border-radius: 10px;">
+              <h4 style="color: #38bdf8; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 600;">OpenAlex Catalog</h4>
+              <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">Dynamically retrieves H-Index, open-access status, and 2-year average citedness (Impact Factor) for target journals.</p>
+            </div>
+            <div class="provenance-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 1.25rem; border-radius: 10px;">
+              <h4 style="color: #38bdf8; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 600;">Google Gemini API</h4>
+              <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">Orchestrates multi-agent analysis swarms using the high-quota gemini-3.1-flash-lite model to ensure precision grading.</p>
+            </div>
+            <div class="provenance-item" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); padding: 1.25rem; border-radius: 10px;">
+              <h4 style="color: #38bdf8; margin-bottom: 0.5rem; font-size: 0.95rem; font-weight: 600;">Local Embedding Store</h4>
+              <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">Calculates chunk similarity locally using sentence-transformers (all-MiniLM-L6-v2) for independent accuracy checks.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Improvement Planner -->
         <div class="glass-card panel-planner" style="grid-column: 1 / -1;">
           <h3><span class="material-icons-round">build</span> Improvement Planner</h3>
@@ -167,6 +374,52 @@
       </div>
     </div>
   </main>
+
+  <!-- Privacy Modal -->
+  <div id="privacyModal" style="display: none; position: fixed; inset: 0; background: rgba(12,26,20,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 2rem;">
+    <div class="glass-card" style="max-width: 750px; width: 100%; max-height: 85vh; overflow-y: auto; background: #ffffff; border-radius: 24px; padding: 2.5rem; position: relative; border: 1px solid rgba(43,76,63,0.12); transform: none; box-shadow: 0 10px 50px rgba(0,0,0,0.15);">
+      <button onclick="document.getElementById('privacyModal').style.display='none'" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; color: #4e6157; cursor: pointer;">&times;</button>
+      
+      <h2 style="font-family: 'Lora', 'Georgia', serif; font-size: 2rem; font-weight: 700; color: #0c1a14; margin-bottom: 0.5rem; border: none; padding: 0; justify-content: flex-start;">Privacy Policy</h2>
+      <p style="color: #4e6157; font-size: 0.85rem; margin-bottom: 2rem; text-align: left;">Last updated: November 2025</p>
+      
+      <div style="text-align: left; display: flex; flex-direction: column; gap: 1.75rem; color: #2b4c3f; font-size: 0.95rem; line-height: 1.6;">
+        <div>
+          <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 1.25rem; font-weight: 700; color: #0c1a14; margin-bottom: 0.5rem; border: none; padding: 0; justify-content: flex-start;">1. AI Safety &amp; No Model Training</h3>
+          <p>We understand that your manuscript contains novel research and intellectual property. Our approach to AI safety is strict and transparent:</p>
+          <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li><strong>No Model Training:</strong> We strictly do <strong>not</strong> use your manuscripts to train, fine-tune, or improve our AI models. Your research remains yours.</li>
+            <li><strong>Vendor Guarantee:</strong> We use Google Cloud's Vertex AI (Gemini) which contractually guarantees that prompts and responses are not used to train models.</li>
+            <li><strong>Isolation:</strong> Your data is processed in an isolated environment and is never shared with other users or the public.</li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 1.25rem; font-weight: 700; color: #0c1a14; margin-bottom: 0.5rem; border: none; padding: 0; justify-content: flex-start;">2. The Lifecycle of Your Manuscript</h3>
+          <p>Unlike traditional services that store your data indefinitely, we operate on a strict retention policy designed for security:</p>
+          <ol style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li><strong>Upload &amp; Encryption:</strong> Your file is uploaded via a secure, encrypted connection (TLS/SSL).</li>
+            <li><strong>Processing:</strong> The file is temporarily stored in volatile memory only for the duration of the AI analysis (typically 1-3 minutes).</li>
+            <li><strong>Report Generation:</strong> Once the analysis is complete, a report is generated and sent to your email.</li>
+            <li><strong>2-Hour Access Window:</strong> The results dashboard is available for exactly 2 hours to allow you to download your feedback.</li>
+            <li><strong>Permanent Deletion:</strong> After 2 hours, the manuscript and the generated report are <strong>permanently and unrecoverably deleted</strong> from our servers.</li>
+          </ol>
+        </div>
+
+        <div>
+          <h3 style="font-family: 'Lora', 'Georgia', serif; font-size: 1.25rem; font-weight: 700; color: #0c1a14; margin-bottom: 0.5rem; border: none; padding: 0; justify-content: flex-start;">3. Information We Collect</h3>
+          <p>We collect only the minimum information necessary to provide our service:</p>
+          <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+            <li><strong>Manuscript Files:</strong> Collected solely for the purpose of generating the review and deleted immediately after the retention period.</li>
+            <li><strong>Email Address:</strong> Required to deliver your review report and provide customer support.</li>
+            <li><strong>Usage Data:</strong> We collect anonymous technical data (browser type, device type) to ensure our website functions correctly.</li>
+          </ul>
+        </div>
+      </div>
+      
+      <button class="btn btn-primary" style="margin-top: 2.5rem; width: 100%; justify-content: center; border-radius: 24px;" onclick="document.getElementById('privacyModal').style.display='none'">Understood</button>
+    </div>
+  </div>
 
   <script src="/main.js?v=2.1"></script>
 </body>

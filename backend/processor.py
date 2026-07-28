@@ -12,8 +12,19 @@ from agents import proofreader, citation_checker, truth_checker, quality_checker
 from agents import novelty_agent, methodology_agent, journal_readiness, ai_reviewer_panel
 
 # Connect to Redis
-redis_conn = Redis(host=os.getenv('REDIS_HOST', 'redis'), port=int(os.getenv('REDIS_PORT', 6379)))
-q = Queue('journabuddy_queue', connection=redis_conn)
+redis_conn = None
+q = None
+USE_REDIS = False
+
+try:
+    redis_conn = Redis(host=os.getenv('REDIS_HOST', 'redis'), port=int(os.getenv('REDIS_PORT', 6379)), socket_timeout=3)
+    redis_conn.ping()
+    q = Queue('journabuddy_queue', connection=redis_conn)
+    USE_REDIS = True
+    print("[Processor] Connected to Redis queue successfully.")
+except Exception as e:
+    print(f"[Processor] Redis offline ({e}). Using local threading fallback.")
+    USE_REDIS = False
 
 def process_pipeline(task_id: str):
     """
@@ -140,5 +151,11 @@ def process_pipeline(task_id: str):
         database.update_task_error(task_id, str(e))
 
 def start_processing(task_id: str):
-    """Enqueues the pipeline job to RQ."""
-    q.enqueue(process_pipeline, task_id)
+    """Enqueues the pipeline job to RQ, or runs in a background thread if offline."""
+    if USE_REDIS:
+        q.enqueue(process_pipeline, task_id)
+    else:
+        import threading
+        # Start the pipeline in a daemon thread so it doesn't block shutdown
+        threading.Thread(target=process_pipeline, args=(task_id,), daemon=True).start()
+        print(f"[Processor] Started background processing thread for task {task_id}")

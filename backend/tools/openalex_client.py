@@ -13,7 +13,10 @@ def search_journal(journal_name: str) -> Dict[str, Any]:
         "publisher": "Unknown",
         "h_index": 0,
         "impact_factor": 0.0,
-        "open_access": False
+        "open_access": False,
+        "issn": [],
+        "apc_usd": None,
+        "homepage_url": None
     }
 
     try:
@@ -31,7 +34,10 @@ def search_journal(journal_name: str) -> Dict[str, Any]:
                     "publisher": source.get("host_organization_name", "Unknown Publisher"),
                     "h_index": summary.get("h_index", 0),
                     "impact_factor": round(summary.get("2yr_mean_citedness", 0.0), 2),
-                    "open_access": source.get("is_oa", False)
+                    "open_access": source.get("is_oa", False),
+                    "issn": source.get("issn", []),
+                    "apc_usd": source.get("apc_usd", None),
+                    "homepage_url": source.get("homepage_url", None)
                 }
     except Exception as e:
         print(f"[OpenAlex] Error fetching {journal_name}: {e}")

@@ -6,7 +6,22 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://journabuddy:secretpassword@db:5432/journabuddy')
 
-engine = create_engine(DATABASE_URL)
+try:
+    if DATABASE_URL.startswith("postgresql"):
+        # Test connection with a short timeout to prevent hanging on startup
+        engine = create_engine(DATABASE_URL, connect_args={"connect_timeout": 3})
+        conn = engine.connect()
+        conn.close()
+        print("[Database] Connected to PostgreSQL successfully.")
+    else:
+        raise ValueError("Not a PostgreSQL connection string.")
+except Exception as e:
+    print(f"[Database] PostgreSQL connection failed ({e}). Falling back to local SQLite.")
+    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'journabuddy.db'))
+    DATABASE_URL = f"sqlite:///{db_path}"
+    # SQLite needs special config for multi-threading in Flask dev mode
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -55,7 +70,7 @@ def get_task(task_id: str) -> dict:
             'task_id': task.task_id,
             'status': task.status,
             'current_agent': task.current_agent,
-            'completed_agents': json.loads(task.completed_agents) if task.completed_agents else [],
+            'agents_completed': json.loads(task.completed_agents) if task.completed_agents else [],
             'result': json.loads(task.result) if task.result else None,
             'error': task.error,
             'timestamp': task.timestamp
