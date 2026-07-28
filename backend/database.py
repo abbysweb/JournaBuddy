@@ -1,7 +1,7 @@
 import os
 import json
 import time
-from sqlalchemy import create_engine, Column, String, Float, Text
+from sqlalchemy import create_engine, Column, String, Float, Text, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://journabuddy:secretpassword@db:5432/journabuddy')
@@ -36,7 +36,93 @@ class Task(Base):
     error = Column(Text, nullable=True)
     timestamp = Column(Float, default=time.time)
 
-# We will use Alembic for migrations, but we can call create_all for local dev fallback
+class Journal(Base):
+    __tablename__ = "journals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    issn = Column(String, index=True, nullable=True)
+    eissn = Column(String, nullable=True)
+    title = Column(String, nullable=False)
+    publisher = Column(String, nullable=True)
+    openalex_id = Column(String, nullable=True)
+    is_oa = Column(Boolean, default=False)
+    scope_description = Column(Text, nullable=True)
+    scope_embedding = Column(Text, nullable=True)  # JSON serialized array of floats
+    created_at = Column(Float, default=time.time)
+    updated_at = Column(Float, default=time.time)
+
+class JournalMetric(Base):
+    __tablename__ = "journal_metrics"
+
+    journal_id = Column(Integer, ForeignKey("journals.id"), primary_key=True)
+    year = Column(Integer, primary_key=True)
+    works_count = Column(Integer, nullable=True)
+    cited_by_count = Column(Integer, nullable=True)
+    h_index = Column(Integer, nullable=True)
+    two_yr_mean_citedness = Column(Float, nullable=True)
+
+class JournalTrustFlag(Base):
+    __tablename__ = "journal_trust_flags"
+
+    journal_id = Column(Integer, ForeignKey("journals.id"), primary_key=True)
+    in_doaj = Column(Boolean, default=False)
+    doaj_seal = Column(Boolean, default=False)
+    cope_member = Column(Boolean, default=False)
+    oaspa_member = Column(Boolean, default=False)
+    retraction_count = Column(Integer, default=0)
+    last_checked = Column(Float, default=time.time)
+
+class ResolvedReference(Base):
+    __tablename__ = "resolved_references"
+
+    id = Column(Integer, primary_key=True, index=True)
+    raw_citation_text = Column(Text, nullable=True)
+    doi = Column(String, unique=True, index=True, nullable=True)
+    title = Column(String, nullable=True)
+    year = Column(Integer, nullable=True)
+    venue_type = Column(String, nullable=True)
+    openalex_id = Column(String, nullable=True)
+    cited_by_count = Column(Integer, nullable=True)
+    concepts = Column(Text, nullable=True)  # JSON string
+    resolved_at = Column(Float, default=time.time)
+
+class ManuscriptInsight(Base):
+    __tablename__ = "manuscript_insights"
+
+    manuscript_check_id = Column(String, primary_key=True, index=True)  # maps to task_id
+    readability = Column(Text, nullable=True)  # JSON string
+    citation_analytics = Column(Text, nullable=True)  # JSON string
+    topic_analytics = Column(Text, nullable=True)  # JSON string
+    benchmark_comparison = Column(Text, nullable=True)  # JSON string
+    provenance_ids = Column(Text, nullable=True)  # JSON string
+    computed_at = Column(Float, default=time.time)
+
+class FieldBenchmark(Base):
+    __tablename__ = "field_benchmarks"
+
+    openalex_concept_id = Column(String, primary_key=True, index=True)
+    concept_name = Column(String, nullable=True)
+    avg_word_count = Column(Float, nullable=True)
+    avg_reference_count = Column(Float, nullable=True)
+    avg_reference_recency_years = Column(Float, nullable=True)
+    sample_size = Column(Integer, nullable=True)
+    computed_at = Column(Float, default=time.time)
+
+class ProvenanceLog(Base):
+    __tablename__ = "provenance_log"
+
+    id = Column(Integer, primary_key=True, index=True)
+    task_id = Column(String, index=True, nullable=True)
+    metric_name = Column(String, nullable=True)
+    metric_value = Column(Text, nullable=True)  # JSON string
+    formula = Column(Text, nullable=True)
+    data_sources = Column(Text, nullable=True)  # JSON string list
+    confidence_level = Column(String, nullable=True)
+    timestamp = Column(Float, default=time.time)
+    raw_data_snapshot = Column(Text, nullable=True)  # JSON string
+    explanation = Column(Text, nullable=True)
+
+# Create all tables on initialization/import
 Base.metadata.create_all(bind=engine)
 
 def get_db():

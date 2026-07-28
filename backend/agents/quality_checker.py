@@ -4,7 +4,7 @@ import json
 PROMPT = """You are the final quality gatekeeper for academic paper review. You receive reports from four prior analysis agents.
 
 Your job:
-1. Meta-analyse ALL three reports for remaining hallucinations or bias.
+1. Meta-analyse ALL four reports for remaining hallucinations or bias.
 2. Compute quality metrics.
 3. Provide ACTIONABLE improvement suggestions — specific, concrete, with section references.
 

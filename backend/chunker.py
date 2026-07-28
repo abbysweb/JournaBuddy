@@ -1,34 +1,5 @@
 import re
 
-def semantic_chunk_text(text: str, max_chunk_size: int = 1500, overlap: int = 200) -> list[str]:
-    """
-    Splits text into semantic chunks based on paragraphs, aiming for roughly `max_chunk_size` characters,
-    with an overlap to preserve context between chunks.
-    """
-    # Simple semantic splitting by double newlines (paragraphs)
-    paragraphs = re.split(r'\n\s*\n', text)
-    
-    chunks = []
-    current_chunk = ""
-    
-    for para in paragraphs:
-        para = para.strip()
-        if not para:
-            continue
-            
-        # If adding the paragraph exceeds chunk size, save current and start new
-        if len(current_chunk) + len(para) > max_chunk_size and current_chunk:
-            chunks.append(current_chunk.strip())
-            # Start next chunk with the overlap from the end of the previous chunk
-            current_chunk = current_chunk[-overlap:] + " " + para if overlap < len(current_chunk) else para
-        else:
-            current_chunk += " " + para if current_chunk else para
-            
-    if current_chunk:
-        chunks.append(current_chunk.strip())
-        
-    return chunks
-
 def extract_and_chunk_pdf(raw_text: str) -> list[str]:
     """
     Takes raw PDF text, cleans it slightly, and chunks it semantically.

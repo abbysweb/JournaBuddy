@@ -1,4 +1,5 @@
 import os
+import math
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 from sentence_transformers import SentenceTransformer
@@ -7,11 +8,22 @@ QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
 QDRANT_PORT = int(os.getenv("QDRANT_PORT", 6333))
 COLLECTION_NAME = "journabuddy_chunks"
 
-client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
-model = SentenceTransformer("all-MiniLM-L6-v2")
-
+_client = None
+_model = None
 USE_QDRANT = False
-_local_store = {} # task_id -> list of dicts with {"text": text, "vector": vector}
+_local_store = {}
+
+def get_qdrant_client():
+    global _client
+    if _client is None:
+        _client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
+    return _client
+
+def get_embedding_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer("all-MiniLM-L6-v2")
+    return _model
 
 def initialize_vector_store():
     """Ensure the Qdrant collection exists on startup, with connection retries and error fallback."""
@@ -20,7 +32,7 @@ def initialize_vector_store():
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            # Check if Qdrant is reachable
+            client = get_qdrant_client()
             if client.collection_exists(COLLECTION_NAME):
                 print(f"[VectorStore] Qdrant collection '{COLLECTION_NAME}' already exists.")
             else:
@@ -43,15 +55,17 @@ def index_chunks(task_id: str, chunks: list[str]):
     """Embeds and indexes a list of text chunks associated with a task_id."""
     if not chunks:
         return
-        
+    
+    model = get_embedding_model()
     embeddings = model.encode(chunks).tolist()
     
     if USE_QDRANT:
         try:
+            client = get_qdrant_client()
             points = []
             for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
                 points.append(PointStruct(
-                    id=hash(f"{task_id}_{i}") % ((1<<63)-1),  # Qdrant accepts unsigned int64
+                    id=hash(f"{task_id}_{i}") % ((1<<63)-1),
                     vector=embedding,
                     payload={"task_id": task_id, "chunk_index": i, "text": chunk}
                 ))
@@ -72,10 +86,12 @@ def index_chunks(task_id: str, chunks: list[str]):
 
 def search_chunks(task_id: str, query: str, top_k: int = 5) -> list[str]:
     """Semantic search for chunks related to a query within a specific task."""
+    model = get_embedding_model()
     query_vector = model.encode(query).tolist()
     
     if USE_QDRANT:
         try:
+            client = get_qdrant_client()
             results = client.search(
                 collection_name=COLLECTION_NAME,
                 query_vector=query_vector,
@@ -89,13 +105,12 @@ def search_chunks(task_id: str, query: str, top_k: int = 5) -> list[str]:
             return [hit.payload["text"] for hit in results]
         except Exception as e:
             print(f"[VectorStore] Qdrant search failed ({e}). Falling back to local in-memory search.")
-            
+
     # Local fallback search using manual cosine similarity
     chunks_data = _local_store.get(task_id, [])
     if not chunks_data:
         return []
-        
-    import math
+
     def dot_product(v1, v2):
         return sum(x*y for x, y in zip(v1, v2))
     def magnitude(v):
@@ -106,11 +121,11 @@ def search_chunks(task_id: str, query: str, top_k: int = 5) -> list[str]:
         if mag1 == 0 or mag2 == 0:
             return 0
         return dot_product(v1, v2) / (mag1 * mag2)
-        
+
     scored_chunks = []
     for item in chunks_data:
         score = cosine_similarity(query_vector, item["vector"])
         scored_chunks.append((score, item["text"]))
-        
+
     scored_chunks.sort(key=lambda x: x[0], reverse=True)
     return [text for _, text in scored_chunks[:top_k]]

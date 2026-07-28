@@ -3,16 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer
-
-# Initialize the model (lazy load to prevent slowing down imports)
-_model = None
-
-def get_model():
-    global _model
-    if _model is None:
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
-    return _model
+from vector_store import get_embedding_model
 
 def chunk_text(text, max_words=50):
     words = text.split()
@@ -52,7 +43,7 @@ def run(raw_text: str) -> dict:
     
     flagged = []
     max_similarity = 0
-    model = get_model()
+    model = get_embedding_model()
     
     for chunk in target_chunks:
         if len(chunk.split()) < 10:

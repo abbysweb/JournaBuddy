@@ -1,34 +1,46 @@
 import os
 import time
 import random
+import threading
 from openai import OpenAI
 
-# API Handling Configuration
-# NVIDIA NIM API configuration for LLM queries.
-# The API key should be set as an environment variable (NVIDIA_API_KEY) in the .env file.
-# We fallback to a placeholder if not set to prevent immediate crashes, but warn the developer.
-NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "PLACEHOLDER_KEY_SET_NVIDIA_API_KEY_IN_ENV")
-MODEL_NAME = os.getenv("MODEL_NAME", "poolside/laguna-xs-2.1")
+PLACEHOLDER_PATTERNS = ["placeholder", "your_", "changeme"]
+
+def is_key_usable(key: str | None) -> bool:
+    if not key or not key.strip():
+        return False
+    key_lower = key.strip().lower()
+    return not any(p in key_lower for p in PLACEHOLDER_PATTERNS)
+
+NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "")
+MODEL_NAME = os.getenv("MODEL_NAME", "deepseek-ai/deepseek-v4-flash")
 BASE_URL = os.getenv("LLM_BASE_URL", "https://integrate.api.nvidia.com/v1")
 
+MAX_CONCURRENT = int(os.getenv("API_MAX_CONCURRENT", "6"))
+
 class APIHandler:
-    """
-    Handles connections and completions from the NVIDIA NIM API.
-    Utilizes exponential backoff to handle rate limits (HTTP 429) gracefully.
-    """
     def __init__(self):
-        # Warn if the developer has not configured their API key
-        if NVIDIA_API_KEY == "PLACEHOLDER_KEY_SET_NVIDIA_API_KEY_IN_ENV":
-            print("[WARNING] [API Handler] NVIDIA_API_KEY environment variable is not set. API calls will fail.")
-            
-        self.client = OpenAI(
-            base_url=BASE_URL,
-            api_key=NVIDIA_API_KEY
-        )
-        print(f"[API Handler] Initialized with endpoint {BASE_URL} and model {MODEL_NAME}.")
+        self._usable = is_key_usable(NVIDIA_API_KEY)
+        self._semaphore = threading.Semaphore(MAX_CONCURRENT)
+        if not self._usable:
+            print("[WARNING] [API Handler] NVIDIA_API_KEY is missing or looks like a placeholder. API calls will fail.")
+            self.client = None
+        else:
+            self.client = OpenAI(base_url=BASE_URL, api_key=NVIDIA_API_KEY)
+            print(f"[API Handler] Initialized with endpoint {BASE_URL} and model {MODEL_NAME}. Max concurrent: {MAX_CONCURRENT}")
 
     def generate_completion(self, prompt: str, temperature: float = 0.2, max_retries: int = 5) -> str:
-        """Handles the direct API request to the LLM with robust exponential backoff."""
+        if not self._usable or self.client is None:
+            return "[API Error: NVIDIA_API_KEY not configured]"
+
+        self._semaphore.acquire()
+        try:
+            return self._call_with_retry(prompt, temperature, max_retries)
+        finally:
+            self._semaphore.release()
+
+    def _call_with_retry(self, prompt: str, temperature: float, max_retries: int) -> str:
+        last_error = None
         for attempt in range(max_retries):
             try:
                 completion = self.client.chat.completions.create(
@@ -37,17 +49,28 @@ class APIHandler:
                     temperature=temperature,
                     top_p=0.95,
                     max_tokens=8192,
-                    stream=False
+                    stream=False,
+                    timeout=90
                 )
                 return completion.choices[0].message.content
             except Exception as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    sleep_time = (attempt + 1) * 3 + random.uniform(0.5, 3.0)
-                    print(f"[API Handler] 429 Rate Limit. Sleeping for {sleep_time:.2f}s...", flush=True)
+                last_error = e
+                err_str = str(e).lower()
+                is_rate_limit = "429" in str(e)
+                is_timeout = "timeout" in err_str or "timed out" in err_str
+
+                if is_rate_limit:
+                    sleep_time = min(30, (2 ** attempt) + random.uniform(0.5, 2.0))
+                    print(f"[API Handler] 429 Rate Limit (attempt {attempt+1}/{max_retries}). Backoff {sleep_time:.1f}s", flush=True)
                     time.sleep(sleep_time)
-                    continue
-                if attempt == max_retries - 1:
+                elif is_timeout:
+                    if attempt < max_retries - 1:
+                        sleep_time = (attempt + 1) * 2
+                        print(f"[API Handler] Timeout (attempt {attempt+1}/{max_retries}). Retrying in {sleep_time}s...", flush=True)
+                        time.sleep(sleep_time)
+                else:
                     return f"[API Error: {e}]"
 
-# Export a singleton instance of the handler
+        return f"[API Error: {last_error}]"
+
 api_handler = APIHandler()

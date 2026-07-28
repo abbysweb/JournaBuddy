@@ -15,6 +15,7 @@ def search_journal(journal_name: str) -> Dict[str, Any]:
         "impact_factor": 0.0,
         "open_access": False,
         "issn": [],
+        "eissn": None,
         "apc_usd": None,
         "homepage_url": None
     }
@@ -27,15 +28,18 @@ def search_journal(journal_name: str) -> Dict[str, Any]:
             if results:
                 source = results[0]
                 summary = source.get("summary_stats", {})
+                issn_list = source.get("issn", [])
                 
                 return {
                     "found": True,
                     "name": source.get("display_name", journal_name),
                     "publisher": source.get("host_organization_name", "Unknown Publisher"),
+                    "openalex_id": source.get("id"),
                     "h_index": summary.get("h_index", 0),
                     "impact_factor": round(summary.get("2yr_mean_citedness", 0.0), 2),
                     "open_access": source.get("is_oa", False),
-                    "issn": source.get("issn", []),
+                    "issn": issn_list,
+                    "eissn": next((i for i in issn_list if len(i) == 9 and i[4] == '-'), None),
                     "apc_usd": source.get("apc_usd", None),
                     "homepage_url": source.get("homepage_url", None)
                 }
