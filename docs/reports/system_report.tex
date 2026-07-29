@@ -50,7 +50,7 @@ Instead of guessing whether a manuscript will be rejected due to poor formatting
     \item \textbf{Semantic / AI Layer:} Uses local LLM agents and vector search to evaluate methodology and journal scope fit.
 \end{enumerate}
 
----
+\bigskip
 
 \section{System Diagrams \& Visual Architecture}
 
@@ -91,7 +91,7 @@ Think of this diagram as a service interaction menu:
     \item \textbf{External Academic APIs:} Query services like OpenAlex and Crossref in the background for citation metrics and publisher trust indicators.
 \end{itemize}
 
----
+\bigskip
 
 \subsection{2. System Architecture Diagram}
 The System Architecture Diagram displays the multi-tier containerized stack powering JournaBuddy.
@@ -126,7 +126,7 @@ Imagine JournaBuddy as a 5-story containerized stack:
     \item \textbf{Basement (Data \& Brain):} Vault storing PostgreSQL vectors, Redis queues, MinIO binaries, and local Ollama LLMs.
 \end{enumerate}
 
----
+\bigskip
 
 \subsection{3. Data Flow Diagram (DFD)}
 The Data Flow Diagram tracks how an uploaded paper moves through processing stages and transforms into score reports.
@@ -161,7 +161,7 @@ The manuscript moves through 5 distinct processing stages:
     \item \textbf{Provenance Log:} Metric calculation sources recorded in PostgreSQL database.
 \end{enumerate}
 
----
+\bigskip
 
 \subsection{4. Sequence Diagram}
 The Sequence Diagram displays the exact order of network messages between components during a live upload.
@@ -198,7 +198,7 @@ This is a timeline showing real-time network messages between components:
     \item FastAPI streams real-time progress right back to your screen over SSE.
 \end{enumerate}
 
----
+\bigskip
 
 \section{Continuous Implementation Roadmap}
 
