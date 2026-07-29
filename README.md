@@ -109,16 +109,22 @@ JournaBuddy/
 ## 🛠️ Getting Started (Local Deployment)
 
 ### Prerequisites
-* Docker Desktop installed and running.
+* **Podman Desktop** (or Docker Desktop) installed and running.
 * Git installed.
 
 ### Quick Start (1-Click Startup)
-Run the Windows batch launcher:
+
+**For Podman Desktop Users:**
+Run the Podman batch launcher:
 ```cmd
-run.bat
+scripts\run_podman.bat
+```
+Or run Podman Compose manually:
+```bash
+podman compose up -d --build
 ```
 
-Or run Docker Compose manually:
+**For Docker Desktop Users:**
 ```bash
 docker-compose up -d --build
 ```

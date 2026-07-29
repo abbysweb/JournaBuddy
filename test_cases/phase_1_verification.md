@@ -2,8 +2,8 @@
 
 ## Verification Plan
 
-### Test Case 1: Docker Containers Initialization
-- **Action**: Run `docker-compose up -d --build` in the root directory.
+### Test Case 1: Containers Initialization (Podman / Docker)
+- **Action**: Run `podman compose up -d --build` (or `scripts\run_podman.bat`) for Podman Desktop, or `docker-compose up -d --build` for Docker Desktop.
 - **Expected Result**: All containers (`api`, `postgres`, `minio`, `redis`, `worker-io`, `worker-llm`, `nginx`, `ollama-1`) start successfully without crashing.
 
 ### Test Case 2: MinIO Access
