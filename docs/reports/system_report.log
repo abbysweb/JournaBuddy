@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.28)  29 JUL 2026 21:56
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.28)  29 JUL 2026 21:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -575,24 +575,24 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 (system_report.aux)
 \openout1 = `system_report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -628,7 +628,7 @@ LaTeX Font Info:    ... okay on input line 30.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 30.
+Package hyperref Info: Link coloring ON on input line 37.
 (system_report.out) (system_report.out)
 \@outlinefile=\write4
 \openout4 = `system_report.out'.
@@ -657,11 +657,11 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 33.
+(Font)              <12> on input line 40.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 33.
+(Font)              <8> on input line 40.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 33.
+(Font)              <6> on input line 40.
 
 (system_report.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -673,14 +673,14 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [1
 
 {C:/Users/PC/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-Overfull \hbox (28.3359pt too wide) in paragraph at lines 77--78
+Overfull \hbox (28.3359pt too wide) in paragraph at lines 84--85
  [] 
  []
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 98.
+(Font)              <7> on input line 105.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 98.
+(Font)              <5> on input line 105.
 [2] [3] [4] (system_report.aux)
  ***********
 LaTeX2e <2025-11-01>
@@ -690,11 +690,11 @@ Package rerunfilecheck Info: File `system_report.out' has not changed.
 (rerunfilecheck)             Checksum: D1C010A9347BF3B49837EB16585E9CB2;1419.
  ) 
 Here is how much of TeX's memory you used:
- 22516 strings out of 467871
- 423088 string characters out of 5428452
- 829588 words of memory out of 5000000
- 51029 multiletter control sequences out of 15000+600000
- 635137 words of font info for 64 fonts, out of 8000000 for 9000
+ 22519 strings out of 467871
+ 423142 string characters out of 5428452
+ 829669 words of memory out of 5000000
+ 51032 multiletter control sequences out of 15000+600000
+ 636024 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,7n,107p,482b,818s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\PC\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm109
@@ -707,7 +707,7 @@ s10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C
 :/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Fi
 les/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX/f
 onts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on system_report.pdf (4 pages, 180593 bytes).
+Output written on system_report.pdf (4 pages, 182239 bytes).
 PDF statistics:
  162 PDF objects out of 1000 (max. 8388607)
  25 named destinations out of 1000 (max. 500000)
