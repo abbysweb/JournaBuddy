@@ -1,0 +1,214 @@
+"""
+JournaBuddy Symbolic Checker Service
+Implements three deterministic rule-based analysis modules:
+
+1. Acronym Resolution Checker — detects acronyms not defined on first use.
+2. Section Completeness Auditor — verifies all mandatory sections are present.
+3. Grammar & Passive Voice Density Analyzer — estimates passive voice percentage.
+
+These checks are fast, offline, and fully deterministic (no LLM required).
+All results are returned in a structured dict ready for provenance logging.
+"""
+import re
+import logging
+from dataclasses import dataclass, field
+from typing import Optional
+
+import textstat
+
+logger = logging.getLogger(__name__)
+
+# Mandatory sections every scientific paper should contain
+REQUIRED_SECTIONS = {
+    "abstract",
+    "introduction",
+    "methodology",
+    "results",
+    "conclusion",
+}
+
+# Common abbreviations that do NOT need to be defined (always acceptable)
+COMMON_ABBREVIATIONS = {
+    "AI", "ML", "NLP", "API", "URL", "HTTP", "HTTPS", "SQL", "PDF", "DOI",
+    "HTML", "CSS", "GPU", "CPU", "RAM", "e.g.", "i.e.", "etc.", "Fig", "Tab",
+    "USA", "EU", "PhD", "MSc", "BSc", "IEEE", "ACM",
+}
+
+# Regex to detect acronym definitions: e.g., "Natural Language Processing (NLP)"
+_DEFINITION_PATTERN = re.compile(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\s+\(([A-Z]{2,})\)")
+
+# Regex to detect standalone uppercase acronyms (2-6 letters)
+_ACRONYM_USAGE_PATTERN = re.compile(r"\b([A-Z]{2,6})\b")
+
+# Passive voice detection: "is/was/were/are/been + past participle"
+_PASSIVE_PATTERN = re.compile(
+    r"\b(is|was|were|are|been|be|being)\s+\w+ed\b",
+    re.IGNORECASE
+)
+
+
+@dataclass
+class SymbolicCheckResult:
+    """
+    Container for all symbolic rule-check results.
+
+    Attributes:
+        undefined_acronyms: List of acronyms found used before definition.
+        defined_acronyms: Dict mapping acronym → full form.
+        missing_sections: Set of required sections not found in the document.
+        found_sections: Set of section headings detected.
+        passive_voice_percent: Estimated percentage of passive voice sentences.
+        flesch_reading_ease: Flesch Reading Ease score (0–100, higher = easier).
+        flesch_kincaid_grade: U.S. grade level required to understand the text.
+        total_words: Total word count of the document.
+        issues: Human-readable list of all detected problems.
+    """
+    undefined_acronyms: list[str] = field(default_factory=list)
+    defined_acronyms: dict[str, str] = field(default_factory=dict)
+    missing_sections: set[str] = field(default_factory=set)
+    found_sections: set[str] = field(default_factory=set)
+    passive_voice_percent: float = 0.0
+    flesch_reading_ease: float = 0.0
+    flesch_kincaid_grade: float = 0.0
+    total_words: int = 0
+    issues: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        """Serialise result to a JSON-compatible dictionary."""
+        return {
+            "undefined_acronyms": self.undefined_acronyms,
+            "defined_acronyms": self.defined_acronyms,
+            "missing_sections": list(self.missing_sections),
+            "found_sections": list(self.found_sections),
+            "passive_voice_percent": round(self.passive_voice_percent, 2),
+            "flesch_reading_ease": round(self.flesch_reading_ease, 2),
+            "flesch_kincaid_grade": round(self.flesch_kincaid_grade, 2),
+            "total_words": self.total_words,
+            "issues": self.issues,
+        }
+
+
+class SymbolicChecker:
+    """
+    Runs three deterministic rule-based checks on extracted PDF text:
+    1. Acronym resolution completeness
+    2. Mandatory section presence
+    3. Passive voice / readability metrics
+
+    Usage:
+        checker = SymbolicChecker()
+        result = checker.check(full_text)
+    """
+
+    def check(self, text: str) -> SymbolicCheckResult:
+        """
+        Execute all symbolic checks on the given text.
+
+        Args:
+            text: Full extracted text from the PDF document.
+
+        Returns:
+            SymbolicCheckResult containing all findings.
+        """
+        result = SymbolicCheckResult()
+
+        self._check_acronyms(text, result)
+        self._check_sections(text, result)
+        self._check_readability(text, result)
+
+        logger.info(
+            f"Symbolic check complete — "
+            f"undefined acronyms: {len(result.undefined_acronyms)}, "
+            f"missing sections: {len(result.missing_sections)}, "
+            f"passive voice: {result.passive_voice_percent:.1f}%"
+        )
+        return result
+
+    def _check_acronyms(self, text: str, result: SymbolicCheckResult) -> None:
+        """
+        Detect acronyms used before or without a definition.
+        Scans for the pattern "Full Name (ACRONYM)" to build the definition set.
+        """
+        # Step 1: find all acronyms that are properly defined
+        definitions = _DEFINITION_PATTERN.findall(text)
+        defined = {acronym: full_form for full_form, acronym in definitions}
+        result.defined_acronyms = defined
+
+        # Step 2: find all standalone uppercase acronym usages
+        used_acronyms = set(_ACRONYM_USAGE_PATTERN.findall(text))
+
+        # Step 3: report acronyms used but never defined
+        for acronym in sorted(used_acronyms):
+            if (
+                acronym not in defined
+                and acronym not in COMMON_ABBREVIATIONS
+                and len(acronym) >= 2
+            ):
+                result.undefined_acronyms.append(acronym)
+
+        if result.undefined_acronyms:
+            result.issues.append(
+                f"Undefined acronyms detected: {', '.join(result.undefined_acronyms[:10])}"
+                + (" (and more)" if len(result.undefined_acronyms) > 10 else "")
+            )
+
+    def _check_sections(self, text: str, result: SymbolicCheckResult) -> None:
+        """
+        Verify that all required academic sections are present in the document.
+        Uses case-insensitive scanning against REQUIRED_SECTIONS.
+        """
+        text_lower = text.lower()
+
+        for section in REQUIRED_SECTIONS:
+            # Allow flexible matching (e.g., "methodology" also matches "methods")
+            if section in text_lower or section.rstrip("y") + "ies" in text_lower:
+                result.found_sections.add(section)
+            elif section == "methodology" and "methods" in text_lower:
+                result.found_sections.add(section)
+            elif section == "conclusion" and "conclusions" in text_lower:
+                result.found_sections.add(section)
+
+        result.missing_sections = REQUIRED_SECTIONS - result.found_sections
+
+        if result.missing_sections:
+            result.issues.append(
+                f"Missing required sections: {', '.join(sorted(result.missing_sections))}"
+            )
+
+    def _check_readability(self, text: str, result: SymbolicCheckResult) -> None:
+        """
+        Calculate passive voice density and Flesch-Kincaid readability scores.
+
+        Passive Voice Formula:
+            passive_count / total_sentences × 100
+
+        Flesch Reading Ease (textstat):
+            206.835 - 1.015 × (words/sentences) - 84.6 × (syllables/words)
+        """
+        sentences = re.split(r"[.!?]+", text)
+        sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
+        total_sentences = max(len(sentences), 1)
+
+        passive_count = sum(
+            1 for s in sentences if _PASSIVE_PATTERN.search(s)
+        )
+        result.passive_voice_percent = (passive_count / total_sentences) * 100
+
+        # textstat metrics (operates on full text)
+        result.flesch_reading_ease = textstat.flesch_reading_ease(text)
+        result.flesch_kincaid_grade = textstat.flesch_kincaid_grade(text)
+        result.total_words = textstat.lexicon_count(text, removepunct=True)
+
+        # Flag high passive voice usage (> 20% is academically discouraged)
+        if result.passive_voice_percent > 20:
+            result.issues.append(
+                f"High passive voice density: {result.passive_voice_percent:.1f}% "
+                f"(recommended < 20%)"
+            )
+
+        # Flag very low readability
+        if result.flesch_reading_ease < 30:
+            result.issues.append(
+                f"Very low readability score: {result.flesch_reading_ease:.1f} "
+                f"(Flesch-Kincaid, higher is better)"
+            )

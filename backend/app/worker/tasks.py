@@ -1,9 +1,325 @@
+"""
+JournaBuddy Celery Task Definitions
+Defines two main task flows routed to the correct worker pools:
+
+  extract_pdf_task  → io_bound queue
+    1. Download PDF from MinIO
+    2. Extract text via pdfplumber
+    3. Chunk text into semantic sections
+    4. Generate sentence-transformer embeddings
+    5. Persist chunks to document_chunks table
+    6. Run symbolic rule checks (acronym, sections, readability)
+    7. Log all metrics to provenance_log
+    8. Dispatch run_agent_task for each LLM agent group
+
+  run_agent_task    → llm_bound queue
+    1. Send structured JSON prompt to OllamaAgent (with cascade fallback)
+    2. Parse and validate JSON response
+    3. Update task dashboard_payload with agent results
+    4. Log agent output to provenance_log
+"""
+import io
+import logging
+import uuid
+from typing import Any
+
+import boto3
+from botocore.exceptions import ClientError
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from app.core.config import settings
 from app.worker.celery_app import celery_app
 
-@celery_app.task(bind=True)
-def extract_pdf(self, file_path):
-    pass
+logger = logging.getLogger(__name__)
 
-@celery_app.task(bind=True)
-def run_agent(self, agent_name, payload):
-    pass
+# LLM agent group definitions: name + prompt template + expected response schema
+AGENT_GROUPS = [
+    {
+        "name": "document_intelligence",
+        "label": "Group A – Document Intelligence",
+        "prompt_template": (
+            "Analyse this academic manuscript excerpt and extract key metadata.\n\n"
+            "Text:\n{text}\n\n"
+            "Return a JSON object with: title (string), authors (list), "
+            "keywords (list of 5-10), domain (string), abstract_quality_score (0-10)."
+        ),
+        "schema": {
+            "title": "string",
+            "authors": ["string"],
+            "keywords": ["string"],
+            "domain": "string",
+            "abstract_quality_score": "number (0-10)",
+        },
+    },
+    {
+        "name": "language_compliance",
+        "label": "Group B – Language & Compliance",
+        "prompt_template": (
+            "Evaluate the academic tone and language compliance of this text.\n\n"
+            "Text:\n{text}\n\n"
+            "Return a JSON object with: tone_score (0-10), formality_score (0-10), "
+            "academic_voice_score (0-10), top_issues (list of strings)."
+        ),
+        "schema": {
+            "tone_score": "number (0-10)",
+            "formality_score": "number (0-10)",
+            "academic_voice_score": "number (0-10)",
+            "top_issues": ["string"],
+        },
+    },
+    {
+        "name": "research_rigor",
+        "label": "Group D – Research Rigor",
+        "prompt_template": (
+            "Evaluate the research rigor and methodological completeness of this text.\n\n"
+            "Text:\n{text}\n\n"
+            "Return a JSON object with: methodology_score (0-10), "
+            "dataset_declaration_present (bool), statistical_validity_score (0-10), "
+            "improvement_suggestions (list of strings)."
+        ),
+        "schema": {
+            "methodology_score": "number (0-10)",
+            "dataset_declaration_present": "boolean",
+            "statistical_validity_score": "number (0-10)",
+            "improvement_suggestions": ["string"],
+        },
+    },
+]
+
+
+def _get_sync_db():
+    """
+    Create a synchronous SQLAlchemy session for use inside Celery workers.
+    Celery tasks are synchronous; asyncpg cannot be used here.
+    Uses psycopg2 driver instead of asyncpg.
+    """
+    sync_url = settings.database_url.replace(
+        "postgresql+asyncpg", "postgresql+psycopg2"
+    )
+    engine = create_engine(sync_url, pool_pre_ping=True)
+    SessionLocal = sessionmaker(bind=engine)
+    return SessionLocal()
+
+
+def _get_minio_client():
+    """Create and return a boto3 S3 client pointing to MinIO."""
+    return boto3.client(
+        "s3",
+        endpoint_url=f"http://{settings.minio_endpoint}",
+        aws_access_key_id=settings.minio_access_key,
+        aws_secret_access_key=settings.minio_secret_key,
+        region_name="us-east-1",
+    )
+
+
+@celery_app.task(bind=True, name="app.worker.tasks.extract_pdf_task", max_retries=3)
+def extract_pdf_task(self, task_id: str, object_key: str) -> dict:
+    """
+    io_bound worker: Full PDF intelligence extraction pipeline.
+
+    Steps:
+        1. Download PDF bytes from MinIO
+        2. Extract text via pdfplumber
+        3. Chunk into semantic sections
+        4. Generate sentence-transformer embeddings
+        5. Persist chunks to DB
+        6. Run symbolic checks
+        7. Log provenance entries
+        8. Dispatch LLM agent tasks
+
+    Args:
+        task_id: UUID string for the analysis task.
+        object_key: MinIO object key of the uploaded PDF.
+
+    Returns:
+        Summary dict with chunk count, agent task IDs, and symbolic check results.
+    """
+    from app.models.models import Task
+    from app.services.pdf_extractor import extract_text_from_pdf
+    from app.services.chunker import SemanticChunker
+    from app.services.embedding_service import EmbeddingService
+    from app.services.symbolic_checker import SymbolicChecker
+    from app.services.provenance_engine import ProvenanceEngine
+
+    task_uuid = uuid.UUID(task_id)
+    db = _get_sync_db()
+
+    try:
+        # ── Step 1: Update task status to "processing" ──
+        task_row = db.query(Task).filter(Task.id == task_uuid).first()
+        if not task_row:
+            logger.error(f"Task {task_id} not found in DB")
+            return {"error": "task_not_found"}
+
+        task_row.status = "processing"
+        task_row.progress_percent = 10
+        db.commit()
+
+        # ── Step 2: Download PDF from MinIO ──
+        logger.info(f"Downloading PDF from MinIO: {object_key}")
+        s3 = _get_minio_client()
+        response = s3.get_object(Bucket=settings.minio_bucket, Key=object_key)
+        pdf_bytes = response["Body"].read()
+
+        # ── Step 3: Extract text from PDF bytes via pdfplumber ──
+        import pdfplumber
+        text = ""
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+
+        task_row.progress_percent = 25
+        db.commit()
+        logger.info(f"Extracted {len(text)} characters from PDF")
+
+        # ── Step 4: Semantic chunking ──
+        chunker = SemanticChunker()
+        chunks = chunker.chunk(text)
+        logger.info(f"Created {len(chunks)} semantic chunks")
+
+        task_row.progress_percent = 40
+        db.commit()
+
+        # ── Step 5: Generate embeddings and store chunks ──
+        embedding_service = EmbeddingService()
+        stored_count = embedding_service.embed_and_store(task_uuid, chunks, db)
+
+        task_row.progress_percent = 60
+        db.commit()
+
+        # ── Step 6: Symbolic rule checks ──
+        checker = SymbolicChecker()
+        symbolic_result = checker.check(text)
+
+        # ── Step 7: Provenance logging ──
+        provenance = ProvenanceEngine(task_uuid, db)
+        provenance.log_symbolic_checks(symbolic_result)
+        db.commit()
+
+        task_row.progress_percent = 75
+        db.commit()
+
+        # ── Step 8: Dispatch LLM agent tasks ──
+        # Use first available chunk text as context for agents
+        context_text = chunks[0].text[:2000] if chunks else text[:2000]
+        agent_task_ids = []
+
+        for agent in AGENT_GROUPS:
+            agent_task = run_agent_task.apply_async(
+                kwargs={
+                    "task_id": task_id,
+                    "agent_name": agent["name"],
+                    "agent_label": agent["label"],
+                    "prompt": agent["prompt_template"].format(text=context_text),
+                    "schema": agent["schema"],
+                },
+                queue="llm_bound",
+            )
+            agent_task_ids.append(agent_task.id)
+            logger.info(f"Dispatched agent task {agent['name']}: {agent_task.id}")
+
+        # ── Mark task as completed (agents run asynchronously) ──
+        task_row.status = "agents_running"
+        task_row.progress_percent = 80
+        task_row.dashboard_payload = {
+            "chunks": stored_count,
+            "symbolic_check": symbolic_result.to_dict(),
+            "agent_tasks": agent_task_ids,
+        }
+        db.commit()
+
+        logger.info(f"Pipeline complete for task {task_id}")
+        return {
+            "task_id": task_id,
+            "chunks_stored": stored_count,
+            "symbolic_issues": symbolic_result.issues,
+            "agent_tasks_dispatched": len(agent_task_ids),
+        }
+
+    except Exception as exc:
+        logger.error(f"extract_pdf_task failed for task {task_id}: {exc}", exc_info=True)
+        try:
+            task_row = db.query(Task).filter(Task.id == task_uuid).first()
+            if task_row:
+                task_row.status = "failed"
+                task_row.dashboard_payload = {"error": str(exc)}
+                db.commit()
+        except Exception:
+            pass
+        # Retry with exponential backoff
+        raise self.retry(exc=exc, countdown=5 * (self.request.retries + 1))
+
+    finally:
+        db.close()
+
+
+@celery_app.task(bind=True, name="app.worker.tasks.run_agent_task", max_retries=2)
+def run_agent_task(
+    self,
+    task_id: str,
+    agent_name: str,
+    agent_label: str,
+    prompt: str,
+    schema: dict,
+) -> dict:
+    """
+    llm_bound worker: Execute a single LLM agent group with cascade fallback.
+
+    Steps:
+        1. Send structured JSON prompt to OllamaAgent (Ollama → NVIDIA NIM → Gemini → OpenAI)
+        2. Validate and parse JSON response
+        3. Merge agent result into task dashboard_payload
+        4. Log to provenance_log
+
+    Args:
+        task_id: UUID string for the analysis task.
+        agent_name: Short machine-readable agent name.
+        agent_label: Human-readable label (e.g., "Group A - Document Intelligence").
+        prompt: Full prompt text for the agent.
+        schema: Expected JSON response schema.
+
+    Returns:
+        Parsed agent result dict.
+    """
+    from app.models.models import Task
+    from app.services.ollama_agent import OllamaAgent
+    from app.services.provenance_engine import ProvenanceEngine
+
+    task_uuid = uuid.UUID(task_id)
+    db = _get_sync_db()
+
+    try:
+        agent = OllamaAgent()
+        logger.info(f"Running agent: {agent_label} for task {task_id}")
+
+        result = agent.run(agent_name=agent_label, prompt=prompt, schema=schema)
+
+        # Determine which provider succeeded (stored in result if degraded)
+        provider = "Ollama" if result.get("status") != "degraded" else "degraded"
+
+        # Persist provenance entry
+        provenance = ProvenanceEngine(task_uuid, db)
+        provenance.log_agent_result(agent_label, result, provider_used=provider)
+
+        # Merge result into task dashboard_payload
+        task_row = db.query(Task).filter(Task.id == task_uuid).first()
+        if task_row:
+            payload = task_row.dashboard_payload or {}
+            if "agents" not in payload:
+                payload["agents"] = {}
+            payload["agents"][agent_name] = result
+            task_row.dashboard_payload = payload
+            db.commit()
+
+        logger.info(f"Agent {agent_label} completed successfully (provider={provider})")
+        return result
+
+    except Exception as exc:
+        logger.error(f"run_agent_task failed: {agent_label} for task {task_id}: {exc}")
+        raise self.retry(exc=exc, countdown=10)
+
+    finally:
+        db.close()

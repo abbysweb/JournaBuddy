@@ -5,3 +5,4 @@
 \contentsline {subsection}{\numberline {2.3}3. Data Flow Diagram (DFD)}{3}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}4. Sequence Diagram}{4}{subsection.2.4}%
 \contentsline {section}{\numberline {3}Continuous Implementation Roadmap}{4}{section.3}%
+\contentsline {section}{\numberline {4}Phase 2: Intelligence Pipeline Components}{4}{section.4}%

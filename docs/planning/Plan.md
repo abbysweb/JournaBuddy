@@ -175,12 +175,12 @@ CREATE TABLE journals (
 * [x] Create project test cases in `/test_cases/phase_1_verification.md`.
 
 ### Phase 2: Intelligence Pipeline & Celery Agent Orchestration (Weeks 3-4)
-* [ ] Setup Celery task queue with `io_bound` and `llm_bound` worker pools.
-* [ ] Integrate Ollama (`Llama 3.1:8b`) with structured JSON schema outputs.
-* [ ] Implement semantic chunking strategy and `sentence-transformers` vectorization.
-* [ ] Implement the `ProvenanceEngine` service to populate `provenance_log`.
-* [ ] Build rule-based symbolic checks for acronyms, paper section completeness, and grammar.
-* [ ] Create Phase 2 test cases in `/test_cases/phase_2_verification.md`.
+* [x] Setup Celery task queue with `io_bound` and `llm_bound` worker pools.
+* [x] Integrate Ollama (`Llama 3.1:8b`) with structured JSON schema outputs and 4-provider cascade fallback (Ollama → NVIDIA NIM → Gemini → OpenAI).
+* [x] Implement semantic chunking strategy and `sentence-transformers` vectorization (all-MiniLM-L6-v2, 384 dimensions, stored in `pgvector`).
+* [x] Implement the `ProvenanceEngine` service to populate `provenance_log` with formula, data sources, confidence level, and raw data snapshots.
+* [x] Build rule-based symbolic checks for acronyms, paper section completeness, passive voice density, and Flesch-Kincaid readability.
+* [x] Create Phase 2 test cases in `/test_cases/phase_2_verification.md`.
 
 ### Phase 3: External Enrichment & Journal Matching (Weeks 5-6)
 * [ ] Build async OpenAlex API client to fetch author profiles and paper citation statistics.
