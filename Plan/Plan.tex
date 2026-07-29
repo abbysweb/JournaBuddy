@@ -1,0 +1,582 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{\textbf{#1}}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\section{JournaBuddy -- Complete System Design \& Implementation
+Plan}\label{journabuddy-complete-system-design-implementation-plan}
+
+\textbf{Author:} Abdullah Al Mamun (ORCID: 0009-0006-7473-0024)\\
+\textbf{Project:} JournaBuddy -- Research Paper Intelligence Platform\\
+\textbf{Status:} Module 1 MVP built. Transitioning to production-grade
+architecture.\\
+\textbf{Goal:} Build a full hybrid system with modern UI, data security,
+error handling, mathematical provenance, and horizontally scalable,
+\textbf{100\% free and open-source} software.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{1. Vision \& Core Philosophy}\label{vision-core-philosophy}
+
+JournaBuddy helps authors prepare manuscripts by combining three
+analysis layers: - \textbf{Symbolic / rule‑based} -- precise,
+explainable checks (Module 1). - \textbf{Statistical NLP} -- continuous,
+benchmarkable metrics (Module 4). - \textbf{Semantic / embedding +
+knowledge graph} -- meaning and relationships (Modules 2, 4).
+
+The system answers four core questions: \textbar{} Question \textbar{}
+Module \textbar{} \textbar----------\textbar--------\textbar{}
+\textbar{} \emph{Is my paper ready to submit?} \textbar{} Module 1:
+Manuscript Readiness Checker \textbar{} \textbar{} \emph{Which journals
+fit my paper?} \textbar{} Module 2: Journal Discovery \& Matching
+\textbar{} \textbar{} \emph{Are those journals trustworthy?} \textbar{}
+Module 3: Journal Trust Scorer \textbar{} \textbar{} \emph{How does my
+paper compare to its field?} \textbar{} Module 4: BI Dashboard \&
+Benchmarking \textbar{}
+
+\textbf{Core principles:} radical transparency, hybrid intelligence,
+user‑centric design, security \& privacy by design, zero‑cost
+infrastructure (no API keys, no usage limits, no vendor lock-in).
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{2. Technology Stack}\label{technology-stack}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1944}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3056}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Layer
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Technology
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+License
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Purpose
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Frontend} & React 19 + TypeScript + Vite & MIT & UI framework \\
+\textbf{Styling} & TailwindCSS 4 & MIT & Utility-first CSS \&
+Glassmorphism \\
+\textbf{Charts} & Apache ECharts \& vis-network & Apache/MIT &
+Interactive dashboards \& graphs \\
+\textbf{State} & Zustand & MIT & Global state management \\
+\textbf{Query} & TanStack Query & MIT & Server state \& caching \\
+\textbf{Backend} & FastAPI (Python) & MIT & Async API server \\
+\textbf{ORM} & SQLAlchemy 2 + Alembic & MIT & Database models \&
+migrations \\
+\textbf{Task Queue} & Celery & BSD & Distributed task processing \\
+\textbf{Broker/Cache} & Redis & BSD & Celery broker, response caching \&
+rate limits \\
+\textbf{Database} & PostgreSQL 16 (via Supabase) & PostgreSQL &
+Relational data \\
+\textbf{Vectors} & pgvector (PostgreSQL extension) & MIT & Embedding
+storage \& search \\
+\textbf{Object Store} & MinIO & AGPLv3 & PDF storage (S3-compatible) \\
+\textbf{LLM Inference} & Ollama & MIT & Local LLM serving (Llama 3.1 /
+Mistral) \\
+\textbf{Embeddings} & sentence-transformers & Apache 2.0 & Text
+embeddings (all-MiniLM-L6-v2) \\
+\textbf{PDF Parsing} & pdfplumber + PyMuPDF & MIT & Text \& layout
+extraction \\
+\textbf{Gateway} & Nginx & BSD & Reverse proxy, static files, rate
+limiting \\
+\textbf{Monitoring} & Prometheus + Grafana + Jaeger & Apache 2.0 &
+Metrics, tracing, dashboards \\
+\end{longtable}
+}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{3. High-Level Architecture \& Data
+Flow}\label{high-level-architecture-data-flow}
+
+\subsubsection{3.1 System Architecture}\label{system-architecture}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{|                              CLIENT LAYER                                    |}
+\NormalTok{|  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+                      |}
+\NormalTok{|  |   Browser    |  |   Browser    |  |   Browser    |                      |}
+\NormalTok{|  |  (React App) |  |  (React App) |  |  (React App) |                      |}
+\NormalTok{|  +{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}+                      |}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{          v                 v                 v}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{|                           GATEWAY LAYER (Nginx)                            |}
+\NormalTok{|  • Reverse proxy to FastAPI (/api/*) • Rate limiting • SSL termination       |}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{                            v}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{|                         API LAYER (FastAPI)                                |}
+\NormalTok{|  • Async endpoints      • Request validation (Pydantic)                     |}
+\NormalTok{|  • JWT authentication   • SSE streaming (/api/stream/\{task\_id\})             |}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{                            v}
+\NormalTok{            +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{            v               v               v}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{|  PostgreSQL   |  |    Redis     |  |    MinIO     |}
+\NormalTok{|  + pgvector   |  |   (Celery    |  |  (PDF Store) |}
+\NormalTok{|  (Supabase)   |  |   + Cache)   |  |              |}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{                            v}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{|                      WORKER LAYER (Celery)                                 |}
+\NormalTok{|  • PDF extraction tasks                                                     |}
+\NormalTok{|  • Embedding generation (sentence{-}transformers)                             |}
+\NormalTok{|  • LLM agent tasks (grouped parallel execution)                             |}
+\NormalTok{|  • External Enrichment (Crossref, OpenAlex, DOAJ)                           |}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{                            v}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\NormalTok{|                      INFERENCE LAYER (Ollama)                              |}
+\NormalTok{|  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+                     |}
+\NormalTok{|  |  Ollama{-}1    |  |  Ollama{-}2    |  |  Ollama{-}3    |                     |}
+\NormalTok{|  |  (Llama 3.1) |  |  (Mistral)   |  |  (CodeLlama) |                     |}
+\NormalTok{|  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+  +{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+                     |}
+\NormalTok{+{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}+}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{3.2 End-to-End Hybrid Data
+Flow}\label{end-to-end-hybrid-data-flow}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Upload:} PDF/DOCX uploaded → extracted via \texttt{pdfplumber}
+  / stored in MinIO.
+\item
+  \textbf{Symbolic Phase:} Run structure, acronyms, citation‑reference,
+  and grammar (LanguageTool) checks.
+\item
+  \textbf{Statistical NLP:} Readability, passive voice, lexical
+  diversity, jargon extraction (textstat, spaCy).
+\item
+  \textbf{Semantic Phase:} Embed abstract, extract keywords (KeyBERT),
+  compute topic similarity.
+\item
+  \textbf{Agent Orchestration (LLM):} Parallel Celery agents execute
+  specific analysis tasks using Ollama.
+\item
+  \textbf{Async Enrichment:} Resolve references via Crossref, fetch
+  citation data from OpenAlex, build citation graph.
+\item
+  \textbf{Benchmarking:} Compare manuscript against field benchmarks
+  (precomputed nightly).
+\item
+  \textbf{Convergence:} Aggregate all results into JSON payload with
+  provenance IDs and stream to frontend via SSE.
+\end{enumerate}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{4. Component Deep Dive}\label{component-deep-dive}
+
+\subsubsection{4.1 FastAPI \& Server-Sent Events
+(SSE)}\label{fastapi-server-sent-events-sse}
+
+File uploads are I/O bound. FastAPI's async/await allows a single
+process to handle hundreds of concurrent uploads without blocking. We
+replace polling with SSE for real-time frontend updates:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@router.get}\NormalTok{(}\StringTok{"/stream/}\SpecialCharTok{\{task\_id\}}\StringTok{"}\NormalTok{)}
+\ControlFlowTok{async} \KeywordTok{def}\NormalTok{ stream\_task(task\_id: }\BuiltInTok{str}\NormalTok{):}
+    \ControlFlowTok{async} \KeywordTok{def}\NormalTok{ event\_stream():}
+\NormalTok{        pubsub }\OperatorTok{=}\NormalTok{ redis.pubsub()}
+\NormalTok{        pubsub.subscribe(}\SpecialStringTok{f"task:}\SpecialCharTok{\{}\NormalTok{task\_id}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+        \ControlFlowTok{async} \ControlFlowTok{for}\NormalTok{ message }\KeywordTok{in}\NormalTok{ pubsub.listen():}
+            \ControlFlowTok{if}\NormalTok{ message[}\StringTok{"type"}\NormalTok{] }\OperatorTok{==} \StringTok{"message"}\NormalTok{:}
+                \ControlFlowTok{yield} \SpecialStringTok{f"data: }\SpecialCharTok{\{}\NormalTok{message[}\StringTok{\textquotesingle{}data\textquotesingle{}}\NormalTok{]}\SpecialCharTok{\}}\CharTok{\textbackslash{}n\textbackslash{}n}\SpecialStringTok{"}
+    \ControlFlowTok{return}\NormalTok{ StreamingResponse(event\_stream(), media\_type}\OperatorTok{=}\StringTok{"text/event{-}stream"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{4.2 Agent Orchestration (Celery +
+Redis)}\label{agent-orchestration-celery-redis}
+
+11 separate LLM calls cause high latency. We optimize this using a
+\textbf{Celery Chord} (parallel groups + sequential callback): -
+\textbf{Phase 1 (I/O):} Extract PDF, chunk, and embed. - \textbf{Phase 2
+(Parallel LLM - 6 concurrent calls):} - \emph{Group A:} Document
+Intelligence (title, authors, keywords) - \emph{Group B:} Language \&
+Compliance (grammar, citations) - \emph{Group C:} Originality Analysis
+(plagiarism risk, novelty) - \emph{Group D:} Research Rigor (methodology
+score) - \emph{Group E:} Submission Readiness (journal fit) -
+\emph{Group F:} Peer Review Simulation (3 personas) - \textbf{Phase 3
+(Dependent Chain):} Truth Checker → Quality Checker → Convergence.
+
+\subsubsection{4.3 Caching \& Cost
+Optimization}\label{caching-cost-optimization}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Content-Addressable Cache:} Hash the extracted text. If the
+  same paper is uploaded, return cached results instantly (100\%
+  savings).
+\item
+  \textbf{Embedding Cache:} Embeddings are deterministic. Cache them in
+  Redis by chunk content hash (30\% savings).
+\item
+  \textbf{LLM Response Cache:} Cache deterministic prompts (like
+  metadata extraction) in Redis (15\% savings).
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{5. Database Schema (PostgreSQL +
+pgvector)}\label{database-schema-postgresql-pgvector}
+
+Using \texttt{pgvector} unifies relational and vector data, reducing
+operational complexity.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{CREATE}\NormalTok{ EXTENSION }\ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ vector;}
+
+\CommentTok{{-}{-} Tasks \& Orchestration}
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ tasks (}
+    \KeywordTok{id}\NormalTok{ UUID }\KeywordTok{PRIMARY} \KeywordTok{KEY} \KeywordTok{DEFAULT}\NormalTok{ gen\_random\_uuid(),}
+\NormalTok{    status }\DataTypeTok{VARCHAR}\NormalTok{(}\DecValTok{50}\NormalTok{) }\KeywordTok{DEFAULT} \StringTok{\textquotesingle{}pending\textquotesingle{}}\NormalTok{,}
+\NormalTok{    dashboard\_payload JSONB,}
+\NormalTok{    progress\_percent }\DataTypeTok{INTEGER} \KeywordTok{DEFAULT} \DecValTok{0}
+\NormalTok{);}
+
+\CommentTok{{-}{-} Semantic Embeddings (pgvector)}
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ document\_chunks (}
+    \KeywordTok{id}\NormalTok{ UUID }\KeywordTok{PRIMARY} \KeywordTok{KEY} \KeywordTok{DEFAULT}\NormalTok{ gen\_random\_uuid(),}
+\NormalTok{    task\_id UUID }\KeywordTok{REFERENCES}\NormalTok{ tasks(}\KeywordTok{id}\NormalTok{) }\KeywordTok{ON} \KeywordTok{DELETE} \KeywordTok{CASCADE}\NormalTok{,}
+\NormalTok{    chunk\_index }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    text\_content TEXT,}
+\NormalTok{    embedding vector(}\DecValTok{384}\NormalTok{)  }\CommentTok{{-}{-} all{-}MiniLM{-}L6{-}v2 produces 384{-}dim vectors}
+\NormalTok{);}
+\KeywordTok{CREATE} \KeywordTok{INDEX} \KeywordTok{ON}\NormalTok{ document\_chunks }\KeywordTok{USING}\NormalTok{ ivfflat (embedding vector\_cosine\_ops);}
+
+\CommentTok{{-}{-} Provenance Log (Radical Transparency)}
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ provenance\_log (}
+    \KeywordTok{id}\NormalTok{ SERIAL }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    task\_id UUID }\KeywordTok{REFERENCES}\NormalTok{ tasks(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    metric\_name TEXT,}
+\NormalTok{    metric\_value JSONB,}
+\NormalTok{    formula TEXT,}
+\NormalTok{    data\_sources TEXT[],}
+\NormalTok{    confidence\_level TEXT,}
+\NormalTok{    raw\_data\_snapshot JSONB}
+\NormalTok{);}
+
+\CommentTok{{-}{-} Journals \& Metrics}
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ journals (}
+    \KeywordTok{id}\NormalTok{ SERIAL }\KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    issn TEXT }\KeywordTok{UNIQUE}\NormalTok{,}
+\NormalTok{    title TEXT,}
+\NormalTok{    scope\_embedding VECTOR(}\DecValTok{384}\NormalTok{)}
+\NormalTok{);}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{6. Provenance \& Truthfulness
+Layer}\label{provenance-truthfulness-layer}
+
+Every metric displayed on the frontend is backed by a verifiable source.
+
+\textbf{Implementation:} - \texttt{ProvenanceEngine} logs every
+calculation into the \texttt{provenance\_log} table. - Frontend fetches
+provenance via \texttt{/api/provenance/\{id\}} and displays expandable
+tooltips on hover.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1739}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.3913}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.1739}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2609}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Metric
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Formula / Method
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Source
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Confidence
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Readability & Flesch‑Kincaid & textstat & High \\
+Journal fit & 0.6 semantic + 0.4 citedness & pgvector + OpenAlex &
+Medium \\
+Trust score & sum(signals)/count(signals) & DOAJ, COPE, OASPA & High \\
+LLM output & Structured JSON Schema & Ollama (Llama 3.1) & Varies \\
+\end{longtable}
+}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{7. Frontend \& UI Design
+System}\label{frontend-ui-design-system}
+
+\textbf{UI/UX Paradigm: Modern Glassmorphism} - \textbf{Colors:}
+Primary: \texttt{\#2b4c3f} (Sage Green), Accent: \texttt{\#38bdf8},
+Glass: \texttt{rgba(255,255,255,0.75)} with blur. - \textbf{Widgets:}
+Radar charts (Quality), Gauge charts (Readiness), Citation network
+(vis-network), Heatmaps (Plagiarism). - \textbf{State Management:}
+TanStack Query handles server state (auto-refetches on focus); Zustand
+handles UI toggles and preferences.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{8. Security, Privacy \& Error
+Handling}\label{security-privacy-error-handling}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Data Privacy:} On-premise processing. Vectors and LLM inputs
+  never touch third-party APIs. MinIO buckets are private. Files deleted
+  after 2h.
+\item
+  \textbf{Resilience:} Celery auto-requeues failed tasks. LLM calls
+  wrapped in \texttt{tenacity} for exponential backoff retries.
+\item
+  \textbf{Input Sanitization:} 50MB max file size. PDF sandboxing
+  (extracted in network-isolated containers).
+\item
+  \textbf{Observability:} Prometheus tracks metrics (tokens consumed,
+  task latency). Loki aggregates JSON logs. Jaeger provides distributed
+  tracing (e.g.,
+  \texttt{{[}Upload{]}\ →\ {[}Extract{]}\ →\ {[}Embed{]}\ →\ {[}Group\ A{]}}).
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{9. Docker Compose Deployment \&
+Hardware}\label{docker-compose-deployment-hardware}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Abridged docker{-}compose.yml}
+\FunctionTok{services}\KeywordTok{:}
+\AttributeTok{  }\FunctionTok{api}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{build}\KeywordTok{:}\AttributeTok{ ./backend}
+\AttributeTok{    }\FunctionTok{command}\KeywordTok{:}\AttributeTok{ uvicorn app.main:app {-}{-}workers 4}
+\AttributeTok{  }\FunctionTok{worker{-}llm}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{build}\KeywordTok{:}\AttributeTok{ ./backend}
+\AttributeTok{    }\FunctionTok{command}\KeywordTok{:}\AttributeTok{ celery {-}A app.worker.celery\_app worker {-}Q llm\_bound {-}c 3}
+\AttributeTok{  }\FunctionTok{postgres}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{image}\KeywordTok{:}\AttributeTok{ ankane/pgvector:latest}
+\AttributeTok{  }\FunctionTok{minio}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{image}\KeywordTok{:}\AttributeTok{ minio/minio}
+\AttributeTok{  }\FunctionTok{ollama{-}1}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{image}\KeywordTok{:}\AttributeTok{ ollama/ollama}
+\AttributeTok{  }\FunctionTok{prometheus}\KeywordTok{:}
+\AttributeTok{    }\FunctionTok{image}\KeywordTok{:}\AttributeTok{ prom/prometheus}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Hardware Requirements:} - \textbf{Development (1 user):} 4
+cores, 16 GB RAM (CPU inference runs at \textasciitilde5-10 tokens/sec).
+- \textbf{Small Team (5--10 users):} 8 cores, 32 GB RAM, RTX 3060 12GB.
+- \textbf{Production (50+ users):} 16+ cores, 64 GB RAM, RTX 4090 24GB.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\subsection{10. Unified Implementation
+Roadmap}\label{unified-implementation-roadmap}
+
+\subsubsection{Phase 1: Foundation \& Data Infrastructure (Weeks
+1-2)}\label{phase-1-foundation-data-infrastructure-weeks-1-2}
+
+\begin{itemize}
+\tightlist
+\item
+  Docker Compose setup (FastAPI, Postgres+pgvector, MinIO, Redis).
+\item
+  Rotate API keys, setup \texttt{.env}.
+\item
+  Build basic PDF extraction pipeline with upload endpoint.
+\item
+  Scaffold React 19 + Vite frontend.
+\end{itemize}
+
+\subsubsection{Phase 2: Intelligence Pipeline \& Celery (Weeks
+3-4)}\label{phase-2-intelligence-pipeline-celery-weeks-3-4}
+
+\begin{itemize}
+\tightlist
+\item
+  Migrate to Celery task queue; implement 6 parallel agent groups.
+\item
+  Integrate Ollama (Llama 3.1:8b) for local LLM inference.
+\item
+  Build semantic chunking \& sentence-transformers embeddings.
+\item
+  Implement the \texttt{ProvenanceEngine} and \texttt{provenance\_log}
+  logic.
+\end{itemize}
+
+\subsubsection{Phase 3: External Enrichments \& Semantic Layers (Weeks
+5-6)}\label{phase-3-external-enrichments-semantic-layers-weeks-5-6}
+
+\begin{itemize}
+\tightlist
+\item
+  Integrate \texttt{textstat}, \texttt{spaCy}, and \texttt{KeyBERT}
+  (Module 4).
+\item
+  Setup Async integrations (Crossref, OpenAlex, DOAJ).
+\item
+  Implement Journal Trust Scorer (Module 3) and Discovery (Module 2).
+\end{itemize}
+
+\subsubsection{Phase 4: Real-time UI \& Dashboard (Week
+7)}\label{phase-4-real-time-ui-dashboard-week-7}
+
+\begin{itemize}
+\tightlist
+\item
+  Build SSE streaming endpoint.
+\item
+  Develop interactive Glassmorphism UI (ECharts, PDF side-by-side view).
+\item
+  Implement provenance tooltips.
+\end{itemize}
+
+\subsubsection{Phase 5: Production Hardening (Week
+8)}\label{phase-5-production-hardening-week-8}
+
+\begin{itemize}
+\tightlist
+\item
+  Content-addressable caching (Redis).
+\item
+  Prometheus + Grafana + Jaeger observability setup.
+\item
+  JWT Authentication, rate limiting (\texttt{slowapi}), and security
+  sweeps.
+\item
+  GitHub Actions for nightly OpenAlex benchmarking.
+\end{itemize}
+
+\textbf{Conclusion:} This hybrid plan successfully combines rigorous
+symbolic logic, provenance tracking, and deep system architecture into a
+production-ready, fully open-source environment.
+
+\end{document}
