@@ -1,110 +1,52 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  app:
-    build: .
-    container_name: journabuddy_app
-    ports:
-      - "5001:5000"
-    volumes:
-      - ./backend/uploads:/app/backend/uploads
-      - ./frontend:/app/frontend
-      - ./backend:/app/backend
-    env_file:
-      - .env
+  # API Server
+  api:
+    build: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
     environment:
-      - DATABASE_URL=postgresql://journabuddy:secretpassword@db:5432/journabuddy
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/journabuddy
+      - REDIS_URL=redis://redis:6379/0
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-      - MINIO_SECURE=false
-    restart: unless-stopped
     depends_on:
-      - db
-      - minio
-      - qdrant
+      - postgres
       - redis
+      - minio
+    ports:
+      - "8000:8000"
 
-  db:
-    image: postgres:15-alpine
-    container_name: journabuddy_db
+  # Databases
+  postgres:
+    image: ankane/pgvector:latest
     environment:
-      POSTGRES_USER: journabuddy
-      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: journabuddy
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U journabuddy"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
 
   minio:
-    image: minio/minio:latest
-    container_name: journabuddy_minio
+    image: minio/minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
     ports:
       - "9000:9000"
       - "9001:9001"
-    volumes:
-      - minio_data:/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: journabuddy_qdrant
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - qdrant_data:/qdrant/storage
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: journabuddy_redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-
-  worker:
-    build: .
-    container_name: journabuddy_worker
-    command: rq worker -u redis://redis:6379/0 journabuddy_queue
-    volumes:
-      - ./backend/uploads:/app/backend/uploads
-      - ./backend:/app/backend
-    env_file:
-      - .env
-    environment:
-      - DATABASE_URL=postgresql://journabuddy:secretpassword@db:5432/journabuddy
-      - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-      - MINIO_SECURE=false
-      - QDRANT_HOST=qdrant
-    restart: unless-stopped
-    depends_on:
-      - redis
-      - db
-      - minio
-
-
 
 volumes:
   postgres_data:
-  minio_data:
-  qdrant_data:
   redis_data:
+  minio_data:
