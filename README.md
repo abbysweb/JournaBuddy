@@ -11,41 +11,35 @@ JournaBuddy aims to answer four core questions for authors:
 3. **Are those journals trustworthy?** - *Journal Trust Scorer*
 4. **How does my paper compare to its field?** - *BI Dashboard & Benchmarking*
 
-## Architecture
+## Architecture (Serverless Vercel Edge)
 
-The system uses a modern, hybrid intelligence stack:
-- **Frontend**: HTML/JS/CSS with a Glass-morphism UI.
-- **Backend**: FastAPI (currently transitioning from Flask) handling REST API endpoints.
-- **Data & Embedding layer**: Statistical NLP (`textstat`, `spaCy`) and Semantic Layer (`sentence-transformers`).
-- **Database**: Postgres with pgvector (via Supabase) to track tasks, registries, metrics, and compute embeddings.
+The project has transitioned to a highly scalable, serverless microservices architecture designed to run on the Vercel free tier with zero operational overhead:
+- **Framework**: Next.js 15 (App Router).
+- **Frontend**: React, TailwindCSS v4, and Glassmorphism UI.
+- **Backend**: Vercel Serverless Functions (`/api/*`).
+- **Database & Storage**: Supabase (Managed PostgreSQL + pgvector + Blob Storage).
+- **AI / NLP**: Groq API (Llama-3 for high-speed inference) and Hugging Face Inference API (for zero-cost embeddings).
+- **Background Tasks**: Upstash / Inngest serverless event queues.
 
-For more details on the implementation roadmap, database schema, and project vision, refer to the [Plan.md](Plan.md) document.
+For complete details on the implementation roadmap, database schema, and project vision, refer to the [Plan/Plan.md](Plan/Plan.md) document.
 
-## Running the Application
+## Running the Application Locally
 
-You can run the application either locally (using a Python virtual environment) or via Docker.
+Make sure you have Node.js installed. Navigate to the `frontend` Next.js directory to start the development server:
 
-### Option 1: Running Locally (Windows)
-Make sure you have Python installed, then simply run:
 ```bash
-run_local.bat
+cd frontend
+npm install
+npm run dev
 ```
-This script will automatically create a virtual environment (`.venv`), install dependencies, start the backend, and open your browser to `http://localhost:5000`.
-
-### Option 2: Running with Docker
-If you have Docker Desktop installed and running, you can start the application using:
-```bash
-run.bat
-```
-This will build the Docker containers and start the service. It opens your browser to `http://localhost:5001`.
+Then, open your browser to `http://localhost:3000`.
 
 ## Project Structure
 
-- `frontend/` - Frontend HTML, JavaScript, and CSS files.
-- `backend/` - Python backend logic, API endpoints, and processing modules.
-- `Plan.md` - Complete implementation plan, detailed database schema, and technology stack.
-- `docker-compose.yml` & `Dockerfile` - Container configuration for the platform.
+- `frontend/` - The Next.js monolithic repository containing both React UI and Serverless API Routes.
+- `frontend-old/` - The legacy Vite-based React frontend.
+- `Plan/` - Complete implementation plan, detailed database schema, and technology stack.
 
 ## Privacy & Security
 
-JournaBuddy is built with security and privacy by design. All file processing is done securely, and the architecture emphasizes data provenance to provide an accountable AI experience.
+JournaBuddy is built with security and privacy by design. All file processing is done securely via Supabase, and the architecture emphasizes data provenance to provide an accountable AI experience.
