@@ -21,5 +21,6 @@ app.add_middleware(
 app.include_router(upload.router, prefix="/api", tags=["upload"])
 
 @app.get("/health")
+@app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
