@@ -85,7 +85,11 @@ The Use Case Diagram shows all primary interactions between scientific authors, 
 \end{center}
 
 \subsubsection*{Intuitive Diagram Breakdown: Use Case}
-Think of this diagram as a restaurant menu showing what users can order. The \textbf{Scientific Author} (on the left) can perform four major actions: uploading a manuscript, checking readiness, finding target journals, and viewing the live dashboard. The \textbf{External APIs} (on the right) work in the background like food suppliers, providing extra data (like citation counts and journal trust metrics) whenever requested.
+Think of this diagram as a service interaction menu:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Scientific Author:} Performs actions like uploading manuscripts, checking readiness rules, matching journals, and viewing live dashboard analytics.
+    \item \textbf{External Academic APIs:} Query services like OpenAlex and Crossref in the background for citation metrics and publisher trust indicators.
+\end{itemize}
 
 ---
 
@@ -113,13 +117,13 @@ The System Architecture Diagram displays the multi-tier containerized stack powe
 \end{center}
 
 \subsubsection*{Intuitive Diagram Breakdown: System Architecture}
-Imagine JournaBuddy as a 5-story building:
-\begin{enumerate}
-    \item \textbf{Top Floor (Client):} The visual web interface where you click buttons and see graphs.
-    \item \textbf{4th Floor (Gateway):} The security guard (Nginx) that filters bad requests and directs traffic.
-    \item \textbf{3rd Floor (API):} The main manager (FastAPI) who receives your uploaded paper and creates processing jobs.
-    \item \textbf{2nd Floor (Workers):} A team of assistant workers (Celery) who do heavy calculations in parallel.
-    \item \textbf{Basement (Data \& Brain):} The vault holding your database (PostgreSQL), memory cache (Redis), file storage (MinIO), and local AI brain (Ollama).
+Imagine JournaBuddy as a 5-story containerized stack:
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Top Floor (Client):} The visual web interface where authors view charts and upload papers.
+    \item \textbf{4th Floor (Gateway):} Nginx proxy directing traffic and terminating SSL.
+    \item \textbf{3rd Floor (API):} FastAPI server managing file uploads and streaming progress.
+    \item \textbf{2nd Floor (Workers):} Celery workers running parallel analysis tasks.
+    \item \textbf{Basement (Data \& Brain):} Vault storing PostgreSQL vectors, Redis queues, MinIO binaries, and local Ollama LLMs.
 \end{enumerate}
 
 ---
@@ -148,8 +152,14 @@ The Data Flow Diagram tracks how an uploaded paper moves through processing stag
 \end{center}
 
 \subsubsection*{Intuitive Diagram Breakdown: Data Flow}
-This flow shows a paper's journey step by step:
-First, your PDF is received (\textbf{Step 1}). Next, the text is extracted from the pages (\textbf{Step 2}). That text is converted into numbers called vectors (\textbf{Step 3}). The AI agents read those numbers and evaluate your paper (\textbf{Step 4}). Finally, every score formula is recorded (\textbf{Step 5}) and safely stored in the database.
+The manuscript moves through 5 distinct processing stages:
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{PDF Upload:} Raw file received and saved securely in MinIO storage.
+    \item \textbf{Text Extraction:} PDF visual layout parsed into structured raw text.
+    \item \textbf{Vector Embedding:} Text converted into 384-dimensional semantic numerical arrays.
+    \item \textbf{LLM Agents:} Parallel AI workers evaluate tone, methodology, and scope fit.
+    \item \textbf{Provenance Log:} Metric calculation sources recorded in PostgreSQL database.
+\end{enumerate}
 
 ---
 
@@ -179,12 +189,14 @@ The Sequence Diagram displays the exact order of network messages between compon
 \end{center}
 
 \subsubsection*{Intuitive Diagram Breakdown: Sequence Diagram}
-This is a timeline showing who talks to whom in real-time:
-1. You click "Upload", sending your file to FastAPI.
-2. FastAPI hands the job to Celery so your browser doesn't freeze waiting.
-3. Celery sends prompts to Ollama to review the text.
-4. Ollama responds with scores and feedback.
-5. FastAPI streams the progress right back to your screen live!
+This is a timeline showing real-time network messages between components:
+\begin{enumerate}[leftmargin=*]
+    \item You click \textbf{"Upload"}, sending your manuscript to FastAPI.
+    \item FastAPI enqueues the job into Celery so your browser doesn't freeze waiting.
+    \item Celery sends text prompts to local Ollama LLM workers.
+    \item Ollama returns structured JSON evaluation scores back to Celery.
+    \item FastAPI streams real-time progress right back to your screen over SSE.
+\end{enumerate}
 
 ---
 

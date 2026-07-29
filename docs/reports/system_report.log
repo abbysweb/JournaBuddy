@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.28)  29 JUL 2026 21:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.28)  29 JUL 2026 22:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -678,9 +678,9 @@ Overfull \hbox (28.3359pt too wide) in paragraph at lines 84--85
  []
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 105.
+(Font)              <7> on input line 109.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 105.
+(Font)              <5> on input line 109.
 [2] [3] [4] (system_report.aux)
  ***********
 LaTeX2e <2025-11-01>
@@ -690,9 +690,9 @@ Package rerunfilecheck Info: File `system_report.out' has not changed.
 (rerunfilecheck)             Checksum: D1C010A9347BF3B49837EB16585E9CB2;1419.
  ) 
 Here is how much of TeX's memory you used:
- 22519 strings out of 467871
- 423142 string characters out of 5428452
- 829650 words of memory out of 5000000
+ 22529 strings out of 467871
+ 423211 string characters out of 5428452
+ 830650 words of memory out of 5000000
  51032 multiletter control sequences out of 15000+600000
  636024 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -707,9 +707,9 @@ s10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C
 :/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Fi
 les/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX/f
 onts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on system_report.pdf (4 pages, 181073 bytes).
+Output written on system_report.pdf (4 pages, 182030 bytes).
 PDF statistics:
- 162 PDF objects out of 1000 (max. 8388607)
- 25 named destinations out of 1000 (max. 500000)
+ 173 PDF objects out of 1000 (max. 8388607)
+ 35 named destinations out of 1000 (max. 500000)
  165 words of extra memory for PDF output out of 10000 (max. 10000000)
 
