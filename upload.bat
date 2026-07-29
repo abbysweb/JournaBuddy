@@ -37,6 +37,11 @@ if "%REPO_URL%"=="" (
 git remote remove origin >nul 2>&1
 git remote add origin %REPO_URL%
 
+:: Remove unnecessary files from tracking just in case
+echo.
+echo Cleaning up unnecessary files...
+git rm -r --cached books/ .opencode/ Report/main.aux Report/main.log Report/main.out Report/main.toc backend/dummy.pdf backend/uploads/dummy.pdf backend/uploads/test.pdf "Plan.md" "Free Model.md" >nul 2>&1
+
 :: Stage all files
 echo.
 echo Staging files for upload...
