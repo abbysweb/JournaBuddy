@@ -1,45 +1,158 @@
-# JournaBuddy
+# JournaBuddy – Research Paper Intelligence Platform
 
-**JournaBuddy** is a Research Paper Intelligence Platform designed to help authors prepare their manuscripts. It combines three analysis layers (symbolic rule-based checks, statistical NLP, and semantic embedding with a knowledge graph) to evaluate and improve research papers prior to submission.
+**JournaBuddy** is an open-source, hybrid AI platform designed to evaluate, optimize, and benchmark scientific manuscripts prior to journal submission. 
 
-## Features
+By combining **symbolic rule checks**, **statistical NLP**, and **semantic LLM agent evaluations**, JournaBuddy provides radical transparency, mathematical provenance, and automated peer-review feedback with zero vendor lock-in.
 
-JournaBuddy aims to answer four core questions for authors:
+---
 
-1. **Is my paper ready to submit?** - *Manuscript Readiness Checker*
-2. **Which journals fit my paper?** - *Journal Discovery & Matching*
-3. **Are those journals trustworthy?** - *Journal Trust Scorer*
-4. **How does my paper compare to its field?** - *BI Dashboard & Benchmarking*
+## 🌟 Core Features & Answers Provided
 
-## Architecture (Serverless Vercel Edge)
+JournaBuddy answers four core questions for scientific authors:
 
-The project has transitioned to a highly scalable, serverless microservices architecture designed to run on the Vercel free tier with zero operational overhead:
-- **Framework**: Next.js 15 (App Router).
-- **Frontend**: React, TailwindCSS v4, and Glassmorphism UI.
-- **Backend**: Vercel Serverless Functions (`/api/*`).
-- **Database & Storage**: Supabase (Managed PostgreSQL + pgvector + Blob Storage).
-- **AI / NLP**: Groq API (Llama-3 for high-speed inference) and Hugging Face Inference API (for zero-cost embeddings).
-- **Background Tasks**: Upstash / Inngest serverless event queues.
+1. **Is my paper ready to submit?** (*Module 1: Manuscript Readiness Checker*)
+   * Evaluates section completeness, acronym resolution, reference-citation linking, and grammar.
+2. **Which journals fit my paper?** (*Module 2: Journal Discovery & Matching*)
+   * Matches abstract & paper embeddings against target journal scopes using `pgvector` cosine similarity.
+3. **Are those journals trustworthy?** (*Module 3: Journal Trust Scorer*)
+   * Cross-checks journal metrics against DOAJ, COPE, and OpenAlex indexing signals.
+4. **How does my paper compare to its field?** (*Module 4: BI Dashboard & Benchmarking*)
+   * Provides Flesch-Kincaid readability metrics, passive voice density, jargon heatmaps, and field-normalized percentiles.
 
-For complete details on the implementation roadmap, database schema, and project vision, refer to the [Plan/Plan.md](Plan/Plan.md) document.
+---
 
-## Running the Application Locally
+## 🚀 Key Production Capabilities
 
-Make sure you have Node.js installed. Navigate to the `frontend` Next.js directory to start the development server:
+* **3-Persona AI Peer Review Simulation:** Generates detailed reports from 3 AI reviewer personas (Strict Methodologist, Domain Specialist, Copy Editor).
+* **Interactive Bounding Box PDF Annotations:** Clicking any extracted suggestion highlights the exact paragraph coordinates directly on the PDF canvas.
+* **BibTeX Auto-Fixer & 2D/3D Citation Graph:** Resolves missing DOIs via Crossref and visualizes citation networks using `vis-network`.
+* **Radical Transparency & Provenance Logging:** Every score is linked to a mathematical formula and logged in `provenance_log`.
+* **Multi-Tier Fallback Cascade:** Local inference via Ollama (`Llama 3.1:8b`) with automatic fallbacks to NVIDIA NIM, Gemini, or OpenAI APIs.
 
-```bash
-cd frontend
-npm install
-npm run dev
+---
+
+## 🏗️ System Architecture & Tech Stack
+
 ```
-Then, open your browser to `http://localhost:3000`.
+[ Client Layer (React 19 + Vite) ]
+             │ (HTTP / SSE)
+             ▼
+[ Reverse Proxy (Nginx Gateway) ]
+             │
+             ▼
+[ API Layer (FastAPI Async Server) ]
+      │             │             │
+      ▼             ▼             ▼
+[ PostgreSQL ]  [ Redis ]    [ MinIO ]
+ (pgvector)    (Broker/Cache) (PDF Store)
+                    │
+                    ▼
+[ Worker Layer (Celery Workers) ]
+                    │
+                    ▼
+[ Inference Layer (Local Ollama LLMs) ]
+```
 
-## Project Structure
+* **Frontend:** React 19 + TypeScript + Vite, TailwindCSS (Glassmorphism UI), Apache ECharts, `vis-network`.
+* **API Gateway:** Nginx reverse proxy + FastAPI async API server.
+* **Database & Vectors:** PostgreSQL 16 with `pgvector` extension (`vector(384)`).
+* **Object Store:** MinIO (S3-compatible private PDF binary storage).
+* **Task Queue & Cache:** Celery 5 worker pools with Redis 7 message broker and SSE Pub/Sub.
+* **Local Inference:** Ollama serving `Llama 3.1:8b` and `sentence-transformers` (`all-MiniLM-L6-v2`).
 
-- `frontend/` - The Next.js monolithic repository containing both React UI and Serverless API Routes.
-- `frontend-old/` - The legacy Vite-based React frontend.
-- `Plan/` - Complete implementation plan, detailed database schema, and technology stack.
+---
 
-## Privacy & Security
+## 📖 Documentation & System Reports
 
-JournaBuddy is built with security and privacy by design. All file processing is done securely via Supabase, and the architecture emphasizes data provenance to provide an accountable AI experience.
+For complete details on the architecture design, database schemas, 8-step data pipeline, error handling strategies, and implementation phases, refer to our master documentation and dynamic reports:
+* 📘 **Master Implementation Plan:** [docs/planning/plan.md](docs/planning/plan.md)
+* 📄 **System Report (LaTeX Source):** [docs/reports/system_report.tex](docs/reports/system_report.tex)
+* 📕 **System Report (Compiled PDF):** [docs/reports/system_report.pdf](docs/reports/system_report.pdf)
+
+---
+
+## 📁 Repository Structure
+
+```
+JournaBuddy/
+├── backend/                  # FastAPI Application & Celery Worker Logic
+│   ├── app/
+│   │   ├── api/              # API Route Handlers (/upload, /health, /stream)
+│   │   ├── core/             # Core Settings & Security Configuration
+│   │   ├── db/               # Database Sessions & Alembic Migrations
+│   │   ├── models/           # SQLAlchemy Models (tasks, chunks, provenance, journals)
+│   │   ├── schemas/          # Pydantic Request & Response Schemas
+│   │   ├── services/         # Extraction & NLP Logic (pdfplumber, textstat)
+│   │   └── worker/           # Celery Task Definitions & App Config
+│   └── Dockerfile            # Multi-stage Python Container Dockerfile
+├── frontend/                 # React 19 + TypeScript + Vite Application
+│   └── src/
+│       ├── components/       # Reusable Glassmorphism UI & Chart Components
+│       ├── hooks/            # Custom React & SSE Hooks
+│       ├── services/         # API Client Services & Network Connections
+│       └── types/            # TypeScript Interfaces & Types
+├── docs/                     # System Documentation
+│   ├── planning/             # Complete System Plan & Master Roadmap (docs/planning/plan.md)
+│   ├── reports/              # Diagnostic Reports & Benchmarks
+│   └── internal/             # Local Rules & Project Guidelines
+├── test_cases/               # Step-by-Step Testing & Verification Suites
+├── scripts/                  # Diagnostics & Verification Helper Scripts
+├── data/                     # Sample Research PDFs & BibTeX Files
+├── monitoring/               # Prometheus & Grafana Configuration Files
+├── docker-compose.yml        # Multi-Container Orchestration Manifest
+├── nginx.conf                # Nginx Gateway Proxy Configuration
+└── run.bat                   # 1-Click Windows Startup Script
+```
+
+---
+
+## 🛠️ Getting Started (Local Deployment)
+
+### Prerequisites
+* Docker Desktop installed and running.
+* Git installed.
+
+### Quick Start (1-Click Startup)
+Run the Windows batch launcher:
+```cmd
+run.bat
+```
+
+Or run Docker Compose manually:
+```bash
+docker-compose up -d --build
+```
+
+Access the services:
+* **Frontend Web App:** `http://localhost`
+* **FastAPI Backend API:** `http://localhost:8000/api` (Swagger Docs: `http://localhost:8000/docs`)
+* **MinIO Object Store Dashboard:** `http://localhost:9001` (User: `minioadmin` | Pass: `minioadmin`)
+
+---
+
+## 🧪 Testing & Verification
+
+JournaBuddy uses phase-by-phase test suites located in the `test_cases/` folder:
+* **Phase 1 Verification:** Refer to [test_cases/phase_1_verification.md](test_cases/phase_1_verification.md) to test container initialization, MinIO uploads, and API health.
+
+Run API health check manually:
+```bash
+curl http://localhost:8000/health
+```
+
+---
+
+## 👤 Author & Attribution
+
+**Abdullah Al Mamun**  
+*BSc, MSc - Software Engineering*  
+TU Wien (Vienna, Austria) & Daffodil International University  
+* **Email:** [mamun.swe.de@gmail.com](mailto:mamun.swe.de@gmail.com)  
+* **GitHub:** [@abbysweb](https://github.com/abbysweb)  
+* **ORCID:** [0009-0006-7473-0024](https://orcid.org/0009-0006-7473-0024)
+
+---
+
+## 📄 License
+
+Licensed under the open-source **MIT License**.

@@ -1,0 +1,7 @@
+\contentsline {section}{\numberline {1}Introduction: What is JournaBuddy?}{2}{section.1}%
+\contentsline {section}{\numberline {2}System Diagrams \& Visual Architecture}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}1. Use Case Diagram}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}2. System Architecture Diagram}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}3. Data Flow Diagram (DFD)}{3}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}4. Sequence Diagram}{4}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Continuous Implementation Roadmap}{4}{section.3}%

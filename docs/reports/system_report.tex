@@ -1,0 +1,194 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, shadows, fit, backgrounds}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={JournaBuddy System Architecture Report},
+}
+
+\title{\textbf{JournaBuddy: System Architecture \& Dynamic Visual Report}\\ \large \textit{Comprehensive "For Dummies" Explanatory Guide with TikZ Diagrams}}
+\author{
+    \textbf{Abdullah Al Mamun}\\
+    \small BSc, MSc - Software Engineering\\
+    \small TU Wien (Vienna, Austria) \& Daffodil International University\\
+    \small Email: \href{mailto:mamun.swe.de@gmail.com}{mamun.swe.de@gmail.com} | GitHub: \href{https://github.com/abbysweb}{@abbysweb}\\
+    \small ORCID: \href{https://orcid.org/0009-0006-7473-0024}{0009-0006-7473-0024}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction: What is JournaBuddy?}
+JournaBuddy is an artificial intelligence platform designed to help scientific authors prepare, optimize, and evaluate their research papers before submitting them to academic journals. 
+
+Instead of guessing whether a manuscript will be rejected due to poor formatting, weak citations, or out-of-scope journal selection, JournaBuddy runs automated checks that evaluate the paper across three core layers:
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Symbolic / Rule-Based Layer:} Checks exact facts (structure, acronym definitions, citation formatting).
+    \item \textbf{Statistical NLP Layer:} Calculates mathematical text scores (readability, passive voice, jargon density).
+    \item \textbf{Semantic / AI Layer:} Uses local LLM agents and vector search to evaluate methodology and journal scope fit.
+\end{enumerate}
+
+---
+
+\section{System Diagrams \& Visual Architecture}
+
+\subsection{1. Use Case Diagram}
+The Use Case Diagram shows all primary interactions between scientific authors, external academic services, and the JournaBuddy system.
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.8cm, every node/.style={font=\sffamily\small}]
+    % Styles
+    \tikzstyle{actor} = [ellipse, draw=blue!80, fill=blue!10, thick, minimum width=2.5cm, minimum height=1cm, align=center]
+    \tikzstyle{usecase} = [rectangle, rounded corners, draw=green!70!black, fill=green!5, thick, minimum width=3.5cm, minimum height=0.8cm, align=center]
+
+    % Nodes
+    \node[actor] (author) {Scientific Author};
+    
+    \node[usecase, right=2.5cm of author, yshift=2cm] (uc1) {Upload Manuscript (PDF)};
+    \node[usecase, right=2.5cm of author, yshift=0.7cm] (uc2) {Check Readiness \& Rules};
+    \node[usecase, right=2.5cm of author, yshift=-0.7cm] (uc3) {Match Target Journals};
+    \node[usecase, right=2.5cm of author, yshift=-2cm] (uc4) {View Live BI Dashboard};
+
+    \node[actor, right=2.5cm of uc2, yshift=0.5cm] (external) {External APIs\\(OpenAlex / Crossref)};
+
+    % Connections
+    \draw[->, >=stealth, thick, blue!80] (author) -- (uc1);
+    \draw[->, >=stealth, thick, blue!80] (author) -- (uc2);
+    \draw[->, >=stealth, thick, blue!80] (author) -- (uc3);
+    \draw[->, >=stealth, thick, blue!80] (author) -- (uc4);
+
+    \draw[<->, >=stealth, dashed, thick, orange!80!black] (uc2) -- (external);
+    \draw[<->, >=stealth, dashed, thick, orange!80!black] (uc3) -- (external);
+\end{tikzpicture}
+\end{center}
+
+\subsubsection*{Explanation "For Dummies": Use Case Diagram}
+Think of this diagram as a restaurant menu showing what users can order. The \textbf{Scientific Author} (on the left) can perform four major actions: uploading a manuscript, checking readiness, finding target journals, and viewing the live dashboard. The \textbf{External APIs} (on the right) work in the background like food suppliers, providing extra data (like citation counts and journal trust metrics) whenever requested.
+
+---
+
+\subsection{2. System Architecture Diagram}
+The System Architecture Diagram displays the multi-tier containerized stack powering JournaBuddy.
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.2cm, every node/.style={font=\sffamily\small}]
+    % Styles
+    \tikzstyle{layer} = [rectangle, rounded corners, draw=black!70, fill=gray!10, thick, minimum width=9cm, minimum height=1cm, align=center]
+    
+    % Layers
+    \node[layer, fill=blue!15] (client) {\textbf{Client Layer:} React 19 + TypeScript + Vite (Glassmorphism Dashboard)};
+    \node[layer, fill=cyan!15, below=0.6cm of client] (nginx) {\textbf{Gateway Layer:} Nginx Proxy (SSL Termination \& Static Files)};
+    \node[layer, fill=green!15, below=0.6cm of nginx] (fastapi) {\textbf{API Layer:} FastAPI Async App (REST Endpoints \& SSE Streams)};
+    \node[layer, fill=orange!15, below=0.6cm of fastapi] (workers) {\textbf{Worker Layer:} Celery Task Queue (6 Parallel LLM Agent Groups)};
+    \node[layer, fill=purple!15, below=0.6cm of workers] (storage) {\textbf{Data \& Inference Layer:} PostgreSQL (pgvector) $\mid$ Redis $\mid$ MinIO $\mid$ Ollama};
+
+    % Arrows
+    \draw[<->, >=stealth, ultra thick, blue!80] (client) -- (nginx);
+    \draw[<->, >=stealth, ultra thick, cyan!80] (nginx) -- (fastapi);
+    \draw[<->, >=stealth, ultra thick, green!80!black] (fastapi) -- (workers);
+    \draw[<->, >=stealth, ultra thick, orange!80!black] (workers) -- (storage);
+\end{tikzpicture}
+\end{center}
+
+\subsubsection*{Explanation "For Dummies": System Architecture}
+Imagine JournaBuddy as a 5-story building:
+\begin{enumerate}
+    \item \textbf{Top Floor (Client):} The visual web interface where you click buttons and see graphs.
+    \item \textbf{4th Floor (Gateway):} The security guard (Nginx) that filters bad requests and directs traffic.
+    \item \textbf{3rd Floor (API):} The main manager (FastAPI) who receives your uploaded paper and creates processing jobs.
+    \item \textbf{2nd Floor (Workers):} A team of assistant workers (Celery) who do heavy calculations in parallel.
+    \item \textbf{Basement (Data \& Brain):} The vault holding your database (PostgreSQL), memory cache (Redis), file storage (MinIO), and local AI brain (Ollama).
+\end{enumerate}
+
+---
+
+\subsection{3. Data Flow Diagram (DFD)}
+The Data Flow Diagram tracks how an uploaded paper moves through processing stages and transforms into score reports.
+
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={font=\sffamily\small}]
+    \tikzstyle{process} = [rectangle, draw=blue!80, fill=blue!5, thick, minimum width=2.8cm, minimum height=0.9cm, align=center]
+    \tikzstyle{datastore} = [cylinder, draw=purple!80, fill=purple!10, shape border rotate=90, aspect=0.25, minimum width=1.8cm, minimum height=0.9cm, align=center]
+
+    \node[process] (upload) {1. PDF Upload};
+    \node[process, right=1.2cm of upload] (extract) {2. Text Extract};
+    \node[process, right=1.2cm of extract] (embed) {3. Vector Embed};
+    \node[process, below=1.2cm of embed] (agent) {4. LLM Agents};
+    \node[process, left=1.2cm of agent] (provenance) {5. Provenance Log};
+    \node[datastore, left=1.2cm of provenance] (db) {PostgreSQL};
+
+    \draw[->, >=stealth, thick] (upload) -- (extract);
+    \draw[->, >=stealth, thick] (extract) -- (embed);
+    \draw[->, >=stealth, thick] (embed) -- (agent);
+    \draw[->, >=stealth, thick] (agent) -- (provenance);
+    \draw[->, >=stealth, thick] (provenance) -- (db);
+\end{tikzpicture}
+\end{center}
+
+\subsubsection*{Explanation "For Dummies": Data Flow Diagram}
+This flow shows a paper's journey step by step:
+First, your PDF is received (\textbf{Step 1}). Next, the text is extracted from the pages (\textbf{Step 2}). That text is converted into numbers called vectors (\textbf{Step 3}). The AI agents read those numbers and evaluate your paper (\textbf{Step 4}). Finally, every score formula is recorded (\textbf{Step 5}) and safely stored in the database.
+
+---
+
+\subsection{4. Sequence Diagram}
+The Sequence Diagram displays the exact order of network messages between components during a live upload.
+
+\begin{center}
+\begin{tikzpicture}[node distance=2cm, every node/.style={font=\sffamily\small}]
+    % Lifelines
+    \node (user) {\textbf{User}};
+    \node[right=2.2cm of user] (api) {\textbf{FastAPI}};
+    \node[right=2.2cm of api] (celery) {\textbf{Celery}};
+    \node[right=2.2cm of celery] (ollama) {\textbf{Ollama}};
+
+    \draw[dashed, gray] (user) -- ++(0,-4.5);
+    \draw[dashed, gray] (api) -- ++(0,-4.5);
+    \draw[dashed, gray] (celery) -- ++(0,-4.5);
+    \draw[dashed, gray] (ollama) -- ++(0,-4.5);
+
+    % Messages
+    \draw[->, >=stealth, thick, blue] ([yshift=-0.8cm]user.south) -- node[above, font=\tiny] {POST /api/upload} ([yshift=-0.8cm]api.south);
+    \draw[->, >=stealth, thick, green!70!black] ([yshift=-1.6cm]api.south) -- node[above, font=\tiny] {Enqueue Task} ([yshift=-1.6cm]celery.south);
+    \draw[->, >=stealth, thick, orange!80!black] ([yshift=-2.4cm]celery.south) -- node[above, font=\tiny] {Prompt LLM} ([yshift=-2.4cm]ollama.south);
+    \draw[<-, >=stealth, dashed, thick, orange!80!black] ([yshift=-3.2cm]celery.south) -- node[above, font=\tiny] {JSON Evaluation} ([yshift=-3.2cm]ollama.south);
+    \draw[<-, >=stealth, dashed, thick, blue] ([yshift=-4.0cm]user.south) -- node[above, font=\tiny] {SSE Stream Progress} ([yshift=-4.0cm]api.south);
+\end{tikzpicture}
+\end{center}
+
+\subsubsection*{Explanation "For Dummies": Sequence Diagram}
+This is a timeline showing who talks to whom in real-time:
+1. You click "Upload", sending your file to FastAPI.
+2. FastAPI hands the job to Celery so your browser doesn't freeze waiting.
+3. Celery sends prompts to Ollama to review the text.
+4. Ollama responds with scores and feedback.
+5. FastAPI streams the progress right back to your screen live!
+
+---
+
+\section{Continuous Implementation Roadmap}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Phase 1 (Infrastructure):} Docker Compose, FastAPI, MinIO, Vite React setup. (Status: \textit{Complete \& Verified})
+    \item \textbf{Phase 2 (AI Pipeline):} Celery workers, Ollama Llama 3.1 integration, vector embeddings.
+    \item \textbf{Phase 3 (External Enrichment):} OpenAlex, Crossref, DOAJ integrations.
+    \item \textbf{Phase 4 (Real-time UI):} Glassmorphism dashboard, SSE streaming, interactive charts.
+    \item \textbf{Phase 5 (Hardening):} Redis caching, Prometheus/Grafana monitoring, security audits.
+\end{itemize}
+
+\end{document}

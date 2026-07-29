@@ -1,23 +1,22 @@
-FROM python:3.11-slim
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install Python dependencies
+# System dependencies for PyMuPDF and general utilities
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libmupdf-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PyTorch CPU first to keep image size small
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Install Python requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy source code
+COPY ./app ./app
 
-# Expose port
+# Expose FastAPI port
 EXPOSE 8000
-
-# Command to run the application (overridden by docker-compose for dev)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
