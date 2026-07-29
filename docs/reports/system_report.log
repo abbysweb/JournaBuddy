@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.28)  29 JUL 2026 21:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.28)  29 JUL 2026 21:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -663,7 +663,10 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 33.
 
-(system_report.toc)
+(system_report.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 3.
+)
 \tf@toc=\write5
 \openout5 = `system_report.toc'.
 
@@ -683,45 +686,30 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
-
-
-Package rerunfilecheck Warning: File `system_report.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `system_report.out':
-(rerunfilecheck)             Before: 5D6A4B689B77C8044A758A67724C660A;1111
-(rerunfilecheck)             After:  D1C010A9347BF3B49837EB16585E9CB2;1419.
+Package rerunfilecheck Info: File `system_report.out' has not changed.
+(rerunfilecheck)             Checksum: D1C010A9347BF3B49837EB16585E9CB2;1419.
  ) 
 Here is how much of TeX's memory you used:
- 22513 strings out of 467871
- 423010 string characters out of 5428452
- 829564 words of memory out of 5000000
- 51024 multiletter control sequences out of 15000+600000
- 634521 words of font info for 62 fonts, out of 8000000 for 9000
+ 22516 strings out of 467871
+ 423088 string characters out of 5428452
+ 829567 words of memory out of 5000000
+ 51029 multiletter control sequences out of 15000+600000
+ 635137 words of font info for 64 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,7n,107p,482b,818s stack positions out of 10000i,1000n,20000p,200000b,200000s
-
-pdfTeX warning (dest): name{section.5} has been referenced but does not exist, 
-replaced by a fixed one
-
-
-pdfTeX warning (dest): name{section.4} has been referenced but does not exist, 
-replaced by a fixed one
-
- <C:\Users\PC\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1095.
-pk><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Progr
-am Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Files/MiK
-TeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX/fonts/type1/public/ams
-fonts/cm/cmr6.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmss1
-0.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/
-Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program File
-s/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX/fon
-ts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on system_report.pdf (4 pages, 179290 bytes).
+ <C:\Users\PC\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm109
+5.pk><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pro
+gram Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Files/M
+iKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX/fonts/t
+ype1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX/fonts/type1/public/a
+msfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cms
+s10.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C
+:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Fi
+les/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX/f
+onts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on system_report.pdf (4 pages, 180325 bytes).
 PDF statistics:
- 156 PDF objects out of 1000 (max. 8388607)
- 27 named destinations out of 1000 (max. 500000)
- 149 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 162 PDF objects out of 1000 (max. 8388607)
+ 25 named destinations out of 1000 (max. 500000)
+ 165 words of extra memory for PDF output out of 10000 (max. 10000000)
 

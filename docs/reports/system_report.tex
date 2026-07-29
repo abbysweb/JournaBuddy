@@ -77,7 +77,7 @@ The Use Case Diagram shows all primary interactions between scientific authors, 
 \end{tikzpicture}
 \end{center}
 
-\subsubsection*{Explanation "For Dummies": Use Case Diagram}
+\subsubsection*{Intuitive Diagram Breakdown: Use Case}
 Think of this diagram as a restaurant menu showing what users can order. The \textbf{Scientific Author} (on the left) can perform four major actions: uploading a manuscript, checking readiness, finding target journals, and viewing the live dashboard. The \textbf{External APIs} (on the right) work in the background like food suppliers, providing extra data (like citation counts and journal trust metrics) whenever requested.
 
 ---
@@ -105,7 +105,7 @@ The System Architecture Diagram displays the multi-tier containerized stack powe
 \end{tikzpicture}
 \end{center}
 
-\subsubsection*{Explanation "For Dummies": System Architecture}
+\subsubsection*{Intuitive Diagram Breakdown: System Architecture}
 Imagine JournaBuddy as a 5-story building:
 \begin{enumerate}
     \item \textbf{Top Floor (Client):} The visual web interface where you click buttons and see graphs.
@@ -140,7 +140,7 @@ The Data Flow Diagram tracks how an uploaded paper moves through processing stag
 \end{tikzpicture}
 \end{center}
 
-\subsubsection*{Explanation "For Dummies": Data Flow Diagram}
+\subsubsection*{Intuitive Diagram Breakdown: Data Flow}
 This flow shows a paper's journey step by step:
 First, your PDF is received (\textbf{Step 1}). Next, the text is extracted from the pages (\textbf{Step 2}). That text is converted into numbers called vectors (\textbf{Step 3}). The AI agents read those numbers and evaluate your paper (\textbf{Step 4}). Finally, every score formula is recorded (\textbf{Step 5}) and safely stored in the database.
 
@@ -171,7 +171,7 @@ The Sequence Diagram displays the exact order of network messages between compon
 \end{tikzpicture}
 \end{center}
 
-\subsubsection*{Explanation "For Dummies": Sequence Diagram}
+\subsubsection*{Intuitive Diagram Breakdown: Sequence Diagram}
 This is a timeline showing who talks to whom in real-time:
 1. You click "Upload", sending your file to FastAPI.
 2. FastAPI hands the job to Celery so your browser doesn't freeze waiting.
