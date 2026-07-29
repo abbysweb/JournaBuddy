@@ -5,3 +5,4 @@
 3. **Ask Before Assuming:** In case of any ambiguity, underspecified requirements, or confusion, STOP and ask the user clarifying questions. Do not make assumptions.
 4. **Comprehensive Commenting:** Always add proper, descriptive comments to the code to explain the system's logic and architecture clearly.
 5. **Continuous Committing:** After making any updates or completing a set of tasks, automatically stage, commit, and push the changes to GitHub with a descriptive commit message.
+6. **Senior Engineering Standards:** Act as a senior software engineer. Ensure the project folder structure is strictly organized. Write code using Object-Oriented Programming (OOP) concepts where appropriate. Maximize the reuse of code. Build robust, secure systems with a strong emphasis on data privacy, adhering to modern industry standards.
