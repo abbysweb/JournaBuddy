@@ -35,6 +35,7 @@ from app.worker.celery_app import celery_app
 from app.services.crossref import CrossrefClient
 from app.services.openalex import OpenAlexClient
 from app.services.journal_matcher import JournalMatcher
+from celery import chord
 
 logger = logging.getLogger(__name__)
 
@@ -204,58 +205,45 @@ def extract_pdf_task(self, task_id: str, object_key: str) -> dict:
         provenance.log_symbolic_checks(symbolic_result)
         db.commit()
 
-        task_row.progress_percent = 75
-        db.commit()
-
-        # ── Step 8: Dispatch LLM agent tasks ──
+        # ── Step 8: Dispatch async tasks in a chord ──
         # Use first available chunk text as context for agents
         context_text = chunks[0].text[:2000] if chunks else text[:2000]
-        agent_task_ids = []
+        
+        async_tasks = []
 
         for agent in AGENT_GROUPS:
-            agent_task = run_agent_task.apply_async(
-                kwargs={
-                    "task_id": task_id,
-                    "agent_name": agent["name"],
-                    "agent_label": agent["label"],
-                    "prompt": agent["prompt_template"].format(text=context_text),
-                    "schema": agent["schema"],
-                },
-                queue="llm_bound",
+            async_tasks.append(
+                run_agent_task.s(
+                    task_id=task_id,
+                    agent_name=agent["name"],
+                    agent_label=agent["label"],
+                    prompt=agent["prompt_template"].format(text=context_text),
+                    schema=agent["schema"],
+                ).set(queue="llm_bound")
             )
-            agent_task_ids.append(agent_task.id)
-            logger.info(f"Dispatched agent task {agent['name']}: {agent_task.id}")
 
         # ── Step 9: Dispatch Phase 3 External Enrichment & Matching ──
-        enrich_task = enrich_references_task.apply_async(
-            kwargs={"task_id": task_id, "text": text},
-            queue="io_bound",
-        )
-        match_task = match_journals_task.apply_async(
-            kwargs={"task_id": task_id},
-            queue="io_bound",
-        )
+        async_tasks.append(enrich_references_task.s(task_id=task_id, text=text).set(queue="io_bound"))
+        async_tasks.append(match_journals_task.s(task_id=task_id).set(queue="io_bound"))
         
-        # ── Mark task as completed (agents and enrichments run asynchronously) ──
+        # ── Mark task as agents_running before chord ──
         task_row.status = "agents_running"
         task_row.progress_percent = 80
         task_row.dashboard_payload = {
             "chunks": stored_count,
             "symbolic_check": symbolic_result.to_dict(),
-            "agent_tasks": agent_task_ids,
-            "enrich_task": enrich_task.id,
-            "match_task": match_task.id,
         }
         db.commit()
 
-        logger.info(f"Pipeline complete for task {task_id}")
+        # Execute chord: wait for all async_tasks to finish, then call finalize_analysis_task
+        chord(async_tasks)(finalize_analysis_task.s(task_id=task_id).set(queue="io_bound"))
+
+        logger.info(f"Pipeline chord dispatched for task {task_id}")
         return {
             "task_id": task_id,
             "chunks_stored": stored_count,
             "symbolic_issues": symbolic_result.issues,
-            "agent_tasks_dispatched": len(agent_task_ids),
-            "enrich_task_dispatched": enrich_task.id,
-            "match_task_dispatched": match_task.id,
+            "status": "chord_dispatched"
         }
 
     except Exception as exc:
@@ -438,3 +426,28 @@ def match_journals_task(self, task_id: str) -> dict:
         return {"matches_found": len(matches)}
     finally:
         db.close()
+
+
+@celery_app.task(bind=True, name="app.worker.tasks.finalize_analysis_task")
+def finalize_analysis_task(self, results, task_id: str):
+    """
+    Called automatically as a Celery chord callback when all LLM agents and 
+    Phase 3 tasks (enrichment, matching) finish executing.
+    """
+    from app.models.models import Task
+    task_uuid = uuid.UUID(task_id)
+    db = _get_sync_db()
+    
+    try:
+        task_row = db.query(Task).filter(Task.id == task_uuid).first()
+        if task_row:
+            task_row.status = "completed"
+            task_row.progress_percent = 100
+            db.commit()
+            logger.info(f"Pipeline finalized and marked as completed for task {task_id}")
+    except Exception as exc:
+        logger.error(f"Error finalizing task {task_id}: {exc}")
+    finally:
+        db.close()
+    
+    return {"status": "finalized"}

@@ -1,122 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import { UploadSection } from './components/UploadSection';
+import { LiveAgentTracker } from './components/LiveAgentTracker';
+import { Dashboard } from './components/Dashboard';
+import { FileSearch } from 'lucide-react';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [dashboardPayload, setDashboardPayload] = useState<any>(null);
+
+  const handleUploadSuccess = (newTaskId: string) => {
+    setTaskId(newTaskId);
+    setDashboardPayload(null);
+  };
+
+  const handleAnalysisComplete = (payload: any) => {
+    setDashboardPayload(payload);
+  };
+
+  const reset = () => {
+    setTaskId(null);
+    setDashboardPayload(null);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-container">
+      <header className="header animate-fade-in">
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '50%', marginBottom: '24px' }}>
+          <FileSearch size={48} color="var(--accent-primary)" />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        <h1><span className="text-gradient">JournaBuddy</span> Intelligence</h1>
+        <p>AI-powered manuscript optimization and journal matching</p>
+      </header>
 
-      <div className="ticks"></div>
+      <main>
+        {!taskId && (
+          <div className="animate-fade-in">
+            <UploadSection onUploadSuccess={handleUploadSuccess} />
+          </div>
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {taskId && !dashboardPayload && (
+          <LiveAgentTracker taskId={taskId} onComplete={handleAnalysisComplete} />
+        )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {dashboardPayload && (
+          <div className="animate-fade-in">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+              <button className="glass-button" onClick={reset}>
+                Analyze Another Paper
+              </button>
+            </div>
+            <Dashboard payload={dashboardPayload} />
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
