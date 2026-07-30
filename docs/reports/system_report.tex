@@ -264,4 +264,58 @@ Phase 3 gives our AI the ability to ``talk to the outside world''. Instead of ju
 Finally, we taught the system to play match-maker. We stored the ``Aims \& Scope'' of real science journals as math vectors. We convert your uploaded PDF into a similar vector. By measuring the angle between these vectors (using pgvector), the system mathematically proves which journal your paper belongs in!
 \end{tcolorbox}
 
+\section{Phase 4 \& 5: System Resilience, Hardening, and Testing}
+
+\subsection*{Resilience \& Circuit Breakers (Section 6)}
+To ensure high availability, JournaBuddy implements Redis-backed circuit breakers and API fallbacks:
+\begin{itemize}
+    \item \textbf{Timeout Protection:} Strict 5-second timeouts applied to all external API calls (Crossref, OpenAlex) to prevent hanging worker threads.
+    \item \textbf{Redis Fallback Cache:} A secondary local cache layer using Redis deduplicates API requests for previously verified DOIs, reducing rate-limiting blockages.
+    \item \textbf{LLM Isolation Validation:} Hardened the Llama 3.1 inference boundaries so a failure in the methodology persona does not crash the domain specialist persona.
+\end{itemize}
+
+\subsection*{Quality Assurance Strategy (Section 7)}
+A comprehensive automated test suite powered by \texttt{pytest} validates the backend:
+\begin{itemize}
+    \item \textbf{Symbolic Logic Testing:} Mathematically verifies acronym resolution accuracy and the Flesch-Kincaid formula engines.
+    \item \textbf{Integration Testing:} Validates FastAPI edge cases, explicitly testing 50MB payload limits (HTTP 413) and non-PDF rejection (HTTP 400).
+    \item \textbf{In-Memory Isolation:} Prevents CI/CD runners from corrupting production databases by injecting a mock \texttt{sqlite+aiosqlite:///:memory:} instance during test execution.
+\end{itemize}
+
+\vspace{0.5cm}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!40!black,title=For Dummies: Resilience \& Testing]
+\textbf{What did we just build?} \\
+We wrapped the system in safety nets. If OpenAlex goes down, our system falls back to a Redis memory cache instead of crashing. If someone uploads a massive 60MB file, the API instantly rejects it before it clogs the memory. We also wrote automated robot-tests that run every time we update code to make sure we didn't break the math formulas!
+\end{tcolorbox}
+
+\bigskip
+
+\section{Section 8: Advanced Production Features}
+
+\subsection*{8.1 3-Persona AI Peer Reviewer Simulation}
+The Celery NLP pipeline concurrently launches three highly specialized Llama 3.1 AI agent profiles to simulate an academic review board:
+\begin{enumerate}
+    \item \textbf{Strict Methodologist (Group F1):} Exclusively critiques sample sizes, controls, and dataset validity.
+    \item \textbf{Domain Specialist (Group F2):} Focuses on literature gaps, novelty scoring, and missing academic citations.
+    \item \textbf{Academic Style Editor (Group F3):} Audits the text for passive voice overuse, readability, and academic jargon clarity.
+\end{enumerate}
+
+\subsection*{8.2 Journal Acceptance Predictor}
+The \texttt{journal\_matcher.py} pgvector similarity engine mathematically calculates an \textbf{Acceptance Likelihood \%} based on the cosine distance between the manuscript and the target journal's historical publications, offering authors a quantitative estimate of publication chances.
+
+\subsection*{8.3 Exportable Manuscript Proof Report}
+A brand new microservice utilizing the Python \texttt{reportlab} engine exposes a \texttt{GET /api/report/\{task\_id\}} endpoint. It dynamically queries the PostgreSQL database and generates a professional, downloadable PDF certificate containing:
+\begin{itemize}
+    \item Flesch-Kincaid Readability Metrics
+    \item Symbolic Rule Warnings
+    \item 3-Persona AI Peer Review Feedback
+    \item Ranked Target Journal Matches
+\end{itemize}
+
+\vspace{0.5cm}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!40!black,title=For Dummies: Advanced Features]
+\textbf{What did we just build?} \\
+We turned JournaBuddy into a complete AI academic board. Instead of one AI giving a generic review, three different "robot reviewers" read your paper at the same time: one checks your stats, one checks your references, and one checks your grammar. We also added a crystal ball that predicts your chance of being accepted to a journal, and finally, a feature that prints all this feedback into a beautifully formatted, downloadable PDF certificate!
+\end{tcolorbox}
+
 \end{document}
