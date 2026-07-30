@@ -1,70 +1,80 @@
 # JournaBuddy – Research Paper Intelligence Platform
 
-**JournaBuddy** is an open-source, hybrid AI platform designed to evaluate, optimize, and benchmark scientific manuscripts prior to journal submission. 
+**JournaBuddy** is an advanced, AI-driven manuscript evaluation platform designed to radically optimize, benchmark, and secure scientific manuscripts prior to journal submission. 
 
-By combining **symbolic rule checks**, **statistical NLP**, and **semantic LLM agent evaluations**, JournaBuddy provides radical transparency, mathematical provenance, and automated peer-review feedback with zero vendor lock-in.
+By combining **rigorous mathematical NLP**, **semantic LLM peer-review evaluations**, and a **predictive logistic regression model**, JournaBuddy provides unmatched transparency, automated feedback, and high-precision journal matching.
 
 ---
 
-## 🌟 Core Features & Answers Provided
+## 🌟 Core Modules
 
-JournaBuddy answers four core questions for scientific authors:
+JournaBuddy answers the most critical questions for scientific authors:
 
-1. **Is my paper ready to submit?** (*Module 1: Manuscript Readiness Checker*)
-   * Evaluates section completeness, acronym resolution, reference-citation linking, and grammar.
-2. **Which journals fit my paper?** (*Module 2: Journal Discovery & Matching*)
-   * Matches abstract & paper embeddings against target journal scopes using `pgvector` cosine similarity.
-3. **Are those journals trustworthy?** (*Module 3: Journal Trust Scorer*)
-   * Cross-checks journal metrics against DOAJ, COPE, and OpenAlex indexing signals.
-4. **How does my paper compare to its field?** (*Module 4: BI Dashboard & Benchmarking*)
-   * Provides Flesch-Kincaid readability metrics, passive voice density, jargon heatmaps, and field-normalized percentiles.
+### 1. Is my paper academically rigorous? (*Mathematical NLP & Readability Engine*)
+We discarded fragile grade-school formulas for rigorous Information Theory mathematics:
+*   **Shannon Entropy:** Calculates the true information density and vocabulary distribution unpredictability.
+*   **Simpson's Diversity Index:** Mathematically detects vocabulary repetition and fluff.
+*   **Coleman-Liau Index:** A PDF-safe grade level metric based strictly on character ratios.
+*   **TF-IDF Keyword Extraction:** Mathematically identifies the most significant terms in the paper.
+
+### 2. Is my paper original? (*Internal Plagiarism Checker*)
+*   Uses `pgvector` to cross-reference every sentence of the uploaded manuscript against a massive PostgreSQL database of all previously uploaded documents using a `CROSS JOIN LATERAL` query. 
+*   Flags plagiarized sentences with exact similarity percentages and cites the source filename.
+
+### 3. Will my paper be accepted? (*Logistic Regression Prediction Model*)
+*   Instead of naive guesses, JournaBuddy uses a **Logistic Regression Sigmoid** algorithm ($P = 1 / (1 + e^{-z})$).
+*   Dynamically calculates Acceptance Likelihood by weighting semantic compatibility (40%), AI Methodological Rigor (30%), Language Density (15%), and Novelty (15%).
+
+### 4. What do the reviewers think? (*AI Peer Review Simulation*)
+*   Runs an asynchronous cascade of AI Agents (Strict Methodologist, Domain Specialist, Copy Editor).
+*   Powered by local **Ollama (`Llama 3.1:8b`)** with dynamic fallbacks to NVIDIA NIM and OpenAI APIs.
+
+### 5. Which journals fit my paper? (*Semantic Matching & Discovery*)
+*   Embeds the manuscript using `sentence-transformers` and performs Cosine Similarity matching against indexed journal aims & scopes using PostgreSQL `pgvector`.
+*   Cross-checks journals against DOAJ, COPE, and OpenAlex for trust scores.
 
 ---
 
 ## 🚀 Key Production Capabilities
 
-* **3-Persona AI Peer Review Simulation:** Generates detailed reports from 3 AI reviewer personas (Strict Methodologist, Domain Specialist, Copy Editor).
-* **Interactive Bounding Box PDF Annotations:** Clicking any extracted suggestion highlights the exact paragraph coordinates directly on the PDF canvas.
-* **BibTeX Auto-Fixer & 2D/3D Citation Graph:** Resolves missing DOIs via Crossref and visualizes citation networks using `vis-network`.
-* **Radical Transparency & Provenance Logging:** Every score is linked to a mathematical formula and logged in `provenance_log`.
-* **Multi-Tier Fallback Cascade:** Local inference via Ollama (`Llama 3.1:8b`) with automatic fallbacks to NVIDIA NIM, Gemini, or OpenAI APIs.
+*   **Dynamic PDF Proof Certificates:** Automatically generates stunning, downloadable PDF reports featuring **ReportLab Vector Graphics** (5-axis Radar Charts for AI reviews, Bar Charts for Journal Matches, and Plagiarism Alerts).
+*   **Interactive Glassmorphism Dashboard:** Real-time progress tracking, Server-Sent Events (SSE), and a modern React UI.
+*   **Asynchronous Celery Architecture:** Non-blocking processing pipelines powered by Celery worker pools and a Redis message broker.
 
 ---
 
 ## 🏗️ System Architecture & Tech Stack
 
 ```
-[ Client Layer (React 19 + Vite) ]
-             │ (HTTP / SSE)
-             ▼
-[ Reverse Proxy (Nginx Gateway) ]
-             │
-             ▼
+[ Client Layer (React 19 + Vite + TailwindCSS) ]
+                     │ (HTTP / SSE)
+                     ▼
 [ API Layer (FastAPI Async Server) ]
-      │             │             │
-      ▼             ▼             ▼
+       │             │             │
+       ▼             ▼             ▼
 [ PostgreSQL ]  [ Redis ]    [ MinIO ]
  (pgvector)    (Broker/Cache) (PDF Store)
-                    │
-                    ▼
-[ Worker Layer (Celery Workers) ]
-                    │
-                    ▼
+                     │
+                     ▼
+[ Worker Layer (Celery Background Workers) ]
+                     │
+                     ▼
 [ Inference Layer (Local Ollama LLMs) ]
 ```
 
-* **Frontend:** React 19 + TypeScript + Vite, TailwindCSS (Glassmorphism UI), Apache ECharts, `vis-network`.
-* **API Gateway:** Nginx reverse proxy + FastAPI async API server.
-* **Database & Vectors:** PostgreSQL 16 with `pgvector` extension (`vector(384)`).
-* **Object Store:** MinIO (S3-compatible private PDF binary storage).
-* **Task Queue & Cache:** Celery 5 worker pools with Redis 7 message broker and SSE Pub/Sub.
-* **Local Inference:** Ollama serving `Llama 3.1:8b` and `sentence-transformers` (`all-MiniLM-L6-v2`).
+*   **Frontend:** React 19 + TypeScript + Vite, TailwindCSS (Glassmorphism UI), Apache ECharts.
+*   **API Gateway:** FastAPI async API server.
+*   **Database & Vectors:** PostgreSQL 16 with `pgvector` extension (`vector(384)`).
+*   **Object Store:** MinIO (S3-compatible private PDF binary storage).
+*   **Task Queue & Cache:** Celery 5 worker pools with Redis 7 message broker and SSE Pub/Sub.
+*   **Local Inference:** Ollama serving `Llama 3.1:8b` and `sentence-transformers` (`all-MiniLM-L6-v2`).
+*   **PDF Generation:** `reportlab` with native vector graphics (`reportlab.graphics`).
 
 ---
 
 ## 📖 Documentation & System Reports
 
-For complete details on the architecture design, database schemas, 8-step data pipeline, error handling strategies, and implementation phases, refer to our master documentation and dynamic reports:
+For complete details on the architecture design, database schemas, data pipelines, and implementation phases, refer to our master documentation:
 * 📘 **Master Implementation Plan:** [docs/planning/plan.md](docs/planning/plan.md)
 * 📄 **System Report (LaTeX Source):** [docs/reports/system_report.tex](docs/reports/system_report.tex)
 * 📕 **System Report (Compiled PDF):** [docs/reports/system_report.pdf](docs/reports/system_report.pdf)
@@ -78,30 +88,21 @@ JournaBuddy/
 ├── backend/                  # FastAPI Application & Celery Worker Logic
 │   ├── app/
 │   │   ├── api/              # API Route Handlers (/upload, /health, /stream)
-│   │   ├── core/             # Core Settings & Security Configuration
 │   │   ├── db/               # Database Sessions & Alembic Migrations
 │   │   ├── models/           # SQLAlchemy Models (tasks, chunks, provenance, journals)
-│   │   ├── schemas/          # Pydantic Request & Response Schemas
-│   │   ├── services/         # Extraction & NLP Logic (pdfplumber, textstat)
-│   │   └── worker/           # Celery Task Definitions & App Config
+│   │   ├── services/         # Plagiarism, AI Agents, NLP Math, Journal Matching
+│   │   └── worker/           # Celery Task Definitions
 │   └── Dockerfile            # Multi-stage Python Container Dockerfile
 ├── frontend/                 # React 19 + TypeScript + Vite Application
 │   └── src/
 │       ├── components/       # Reusable Glassmorphism UI & Chart Components
 │       ├── hooks/            # Custom React & SSE Hooks
-│       ├── services/         # API Client Services & Network Connections
-│       └── types/            # TypeScript Interfaces & Types
-├── docs/                     # System Documentation
-│   ├── planning/             # Complete System Plan & Master Roadmap (docs/planning/plan.md)
-│   ├── reports/              # Diagnostic Reports & Benchmarks
-│   └── internal/             # Local Rules & Project Guidelines
-├── test_cases/               # Step-by-Step Testing & Verification Suites
-├── scripts/                  # Diagnostics & Verification Helper Scripts
-├── data/                     # Sample Research PDFs & BibTeX Files
-├── monitoring/               # Prometheus & Grafana Configuration Files
+│       └── services/         # API Client Services
+├── docs/                     # System Documentation (Plans, Reports, Rules)
+├── test_cases/               # Step-by-Step Testing Suites
+├── data/                     # Sample Research PDFs
 ├── docker-compose.yml        # Multi-Container Orchestration Manifest
-├── nginx.conf                # Nginx Gateway Proxy Configuration
-└── run.bat                   # 1-Click Windows Startup Script
+└── scripts/run_podman.bat    # 1-Click Windows Startup Script
 ```
 
 ---
@@ -109,8 +110,8 @@ JournaBuddy/
 ## 🛠️ Getting Started (Local Deployment)
 
 ### Prerequisites
-* **Podman Desktop** (or Docker Desktop) installed and running.
-* Git installed.
+*   **Podman Desktop** (or Docker Desktop) installed and running.
+*   Git installed.
 
 ### Quick Start (1-Click Startup)
 
@@ -130,17 +131,15 @@ docker-compose up -d --build
 ```
 
 Access the services:
-* **Frontend Web App:** `http://localhost`
-* **FastAPI Backend API:** `http://localhost:8000/api` (Swagger Docs: `http://localhost:8000/docs`)
-* **MinIO Object Store Dashboard:** `http://localhost:9001` (User: `minioadmin` | Pass: `minioadmin`)
+*   **Frontend Web App:** `http://localhost`
+*   **FastAPI Backend API:** `http://localhost:8000/api` (Swagger Docs: `http://localhost:8000/docs`)
+*   **MinIO Object Store Dashboard:** `http://localhost:9001` (User: `minioadmin` | Pass: `minioadmin`)
 
 ---
 
 ## 🧪 Testing & Verification
 
-JournaBuddy uses phase-by-phase test suites located in the `test_cases/` folder:
-* **Phase 1 Verification:** Refer to [test_cases/phase_1_verification.md](test_cases/phase_1_verification.md) to test container initialization, MinIO uploads, and API health.
-
+JournaBuddy uses phase-by-phase test suites located in the `test_cases/` folder.
 Run API health check manually:
 ```bash
 curl http://localhost:8000/health
@@ -153,9 +152,9 @@ curl http://localhost:8000/health
 **Abdullah Al Mamun**  
 *BSc, MSc - Software Engineering*  
 TU Wien (Vienna, Austria) & Daffodil International University  
-* **Email:** [mamun.swe.de@gmail.com](mailto:mamun.swe.de@gmail.com)  
-* **GitHub:** [@abbysweb](https://github.com/abbysweb)  
-* **ORCID:** [0009-0006-7473-0024](https://orcid.org/0009-0006-7473-0024)
+*   **Email:** [mamun.swe.de@gmail.com](mailto:mamun.swe.de@gmail.com)  
+*   **GitHub:** [@abbysweb](https://github.com/abbysweb)  
+*   **ORCID:** [0009-0006-7473-0024](https://orcid.org/0009-0006-7473-0024)
 
 ---
 
