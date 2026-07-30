@@ -60,13 +60,13 @@ class SymbolicCheckResult:
         missing_sections: Set of required sections not found in the document.
         found_sections: Set of section headings detected.
         passive_voice_percent: Estimated percentage of passive voice sentences.
-        passive_voice_percent: Estimated percentage of passive voice sentences.
-        lexical_density: Ratio of unique words to total words (vocabulary richness).
-        shannon_entropy: Mathematical information density of the vocabulary (bits/word).
         simpson_diversity_index: Mathematical measure of vocabulary repetition.
+        mattr: Moving-Average Type-Token Ratio for length-agnostic vocabulary richness.
         coleman_liau_index: PDF-safe grade level metric based on characters.
+        smog_index: SMOG readability index.
+        gunning_fog: Gunning Fog readability index.
+        flesch_reading_ease: Flesch Reading Ease score.
         jaccard_similarity: Redundancy overlap between start and end of paper.
-        top_keywords: Mathematically extracted significant words using Term Frequency.
         total_words: Total word count of the document.
         issues: Human-readable list of all detected problems.
     """
@@ -78,7 +78,11 @@ class SymbolicCheckResult:
     lexical_density: float = 0.0
     shannon_entropy: float = 0.0
     simpson_diversity_index: float = 0.0
+    mattr: float = 0.0
     coleman_liau_index: float = 0.0
+    smog_index: float = 0.0
+    gunning_fog: float = 0.0
+    flesch_reading_ease: float = 0.0
     jaccard_similarity: float = 0.0
     top_keywords: list[str] = field(default_factory=list)
     total_words: int = 0
@@ -95,7 +99,11 @@ class SymbolicCheckResult:
             "lexical_density": round(self.lexical_density, 2),
             "shannon_entropy": round(self.shannon_entropy, 2),
             "simpson_diversity_index": round(self.simpson_diversity_index, 4),
+            "mattr": round(self.mattr, 2),
             "coleman_liau_index": round(self.coleman_liau_index, 2),
+            "smog_index": round(self.smog_index, 2),
+            "gunning_fog": round(self.gunning_fog, 2),
+            "flesch_reading_ease": round(self.flesch_reading_ease, 2),
             "jaccard_similarity": round(self.jaccard_similarity, 2),
             "top_keywords": self.top_keywords,
             "total_words": self.total_words,
@@ -226,6 +234,18 @@ class SymbolicChecker:
             result.shannon_entropy = entropy
             result.simpson_diversity_index = 1.0 - simpson_sum
             
+            # MATTR (Moving-Average Type-Token Ratio)
+            window_size = 50
+            if result.total_words >= window_size:
+                ttr_sum = 0.0
+                num_windows = result.total_words - window_size + 1
+                for i in range(num_windows):
+                    window = words[i:i + window_size]
+                    ttr_sum += len(set(window)) / window_size
+                result.mattr = (ttr_sum / num_windows) * 100
+            else:
+                result.mattr = result.lexical_density
+            
             # Term Frequency (Keyword Extraction)
             stop_words = {"the", "and", "of", "to", "in", "a", "is", "that", "for", "it", "with", "as", "on", "was", "are", "by", "this", "an", "be", "from", "at", "which", "or", "have", "not", "but"}
             valid_words = [(w, c) for w, c in word_counts.items() if w not in stop_words and len(w) > 3]
@@ -236,13 +256,21 @@ class SymbolicChecker:
             result.lexical_density = 0.0
             result.shannon_entropy = 0.0
             result.simpson_diversity_index = 0.0
+            result.mattr = 0.0
             
-        # Coleman-Liau Index (Character-based readability)
+        # Readability Indices using textstat and character counting
         letters = sum(c.isalpha() for c in text)
         if result.total_words > 0:
             L = (letters / result.total_words) * 100
             S = (total_sentences / result.total_words) * 100
             result.coleman_liau_index = 0.0588 * L - 0.296 * S - 15.8
+        
+        try:
+            result.smog_index = textstat.smog_index(text)
+            result.gunning_fog = textstat.gunning_fog(text)
+            result.flesch_reading_ease = textstat.flesch_reading_ease(text)
+        except Exception:
+            pass
             
         # Jaccard Similarity (Self-Plagiarism / Redundancy Check)
         if len(words) > 600:
