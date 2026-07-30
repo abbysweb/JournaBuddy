@@ -91,6 +91,54 @@ AGENT_GROUPS = [
             "improvement_suggestions": ["string"],
         },
     },
+    {
+        "name": "reviewer_methodologist",
+        "label": "Group F1 – Strict Methodologist",
+        "prompt_template": (
+            "Act as a strict methodologist peer reviewer. Evaluate the sample sizes, controls, "
+            "baselines, and statistical validity of the following manuscript excerpt.\n\n"
+            "Text:\n{text}\n\n"
+            "Return a JSON object with: feedback_summary (string), "
+            "methodology_flaws (list of strings), and approve_for_publication (boolean)."
+        ),
+        "schema": {
+            "feedback_summary": "string",
+            "methodology_flaws": ["string"],
+            "approve_for_publication": "boolean",
+        },
+    },
+    {
+        "name": "reviewer_domain_specialist",
+        "label": "Group F2 – Domain Specialist",
+        "prompt_template": (
+            "Act as a domain specialist peer reviewer. Evaluate the novelty, literature gaps, "
+            "and citation completeness of the following manuscript excerpt.\n\n"
+            "Text:\n{text}\n\n"
+            "Return a JSON object with: novelty_score (0-10), "
+            "missing_literature_topics (list of strings), and feedback_summary (string)."
+        ),
+        "schema": {
+            "novelty_score": "number (0-10)",
+            "missing_literature_topics": ["string"],
+            "feedback_summary": "string",
+        },
+    },
+    {
+        "name": "reviewer_style_editor",
+        "label": "Group F3 – Academic Style Editor",
+        "prompt_template": (
+            "Act as an academic copy editor. Audit the tone, jargon clarity, passive voice density, "
+            "and figure/table references of the following manuscript excerpt.\n\n"
+            "Text:\n{text}\n\n"
+            "Return a JSON object with: readability_critique (string), "
+            "jargon_to_simplify (list of strings), and style_score (0-10)."
+        ),
+        "schema": {
+            "readability_critique": "string",
+            "jargon_to_simplify": ["string"],
+            "style_score": "number (0-10)",
+        },
+    },
 ]
 
 

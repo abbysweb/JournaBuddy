@@ -64,6 +64,7 @@ class JournalMatcher:
                     "is_doaj_indexed": row.is_doaj_indexed,
                     "trust_score": float(row.trust_score) if row.trust_score else None,
                     "compatibility_percent": round(float(row.similarity_score) * 100, 1),
+                    "acceptance_likelihood_percent": round(float(row.similarity_score) * 100 * 0.85, 1), # Naive estimation
                 })
             
             logger.info(f"Found {len(matches)} matching journals for task {task_id}")

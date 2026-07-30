@@ -12,7 +12,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from app.api import upload, task
+from app.api import upload, task, report
 from app.core.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
@@ -78,6 +78,7 @@ app.add_middleware(
 # ── Register API Routers ──
 app.include_router(upload.router, prefix="/api", tags=["Upload"])
 app.include_router(task.router, prefix="/api", tags=["Task Status"])
+app.include_router(report.router, prefix="/api", tags=["Report"])
 
 
 # ── Health Check Endpoints ──
