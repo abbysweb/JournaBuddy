@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import textstat
+import math
+from collections import Counter
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +60,9 @@ class SymbolicCheckResult:
         missing_sections: Set of required sections not found in the document.
         found_sections: Set of section headings detected.
         passive_voice_percent: Estimated percentage of passive voice sentences.
-        flesch_reading_ease: Flesch Reading Ease score (0–100, higher = easier).
-        flesch_kincaid_grade: U.S. grade level required to understand the text.
+        passive_voice_percent: Estimated percentage of passive voice sentences.
+        lexical_density: Ratio of unique words to total words (vocabulary richness).
+        shannon_entropy: Mathematical information density of the vocabulary (bits/word).
         total_words: Total word count of the document.
         issues: Human-readable list of all detected problems.
     """
@@ -68,8 +71,8 @@ class SymbolicCheckResult:
     missing_sections: set[str] = field(default_factory=set)
     found_sections: set[str] = field(default_factory=set)
     passive_voice_percent: float = 0.0
-    flesch_reading_ease: float = 0.0
-    flesch_kincaid_grade: float = 0.0
+    lexical_density: float = 0.0
+    shannon_entropy: float = 0.0
     total_words: int = 0
     issues: list[str] = field(default_factory=list)
 
@@ -81,8 +84,8 @@ class SymbolicCheckResult:
             "missing_sections": list(self.missing_sections),
             "found_sections": list(self.found_sections),
             "passive_voice_percent": round(self.passive_voice_percent, 2),
-            "flesch_reading_ease": round(self.flesch_reading_ease, 2),
-            "flesch_kincaid_grade": round(self.flesch_kincaid_grade, 2),
+            "lexical_density": round(self.lexical_density, 2),
+            "shannon_entropy": round(self.shannon_entropy, 2),
             "total_words": self.total_words,
             "issues": self.issues,
         }
@@ -177,13 +180,7 @@ class SymbolicChecker:
 
     def _check_readability(self, text: str, result: SymbolicCheckResult) -> None:
         """
-        Calculate passive voice density and Flesch-Kincaid readability scores.
-
-        Passive Voice Formula:
-            passive_count / total_sentences × 100
-
-        Flesch Reading Ease (textstat):
-            206.835 - 1.015 × (words/sentences) - 84.6 × (syllables/words)
+        Calculate passive voice density and rigorous statistical NLP metrics.
         """
         sentences = re.split(r"[.!?]+", text)
         sentences = [s.strip() for s in sentences if len(s.strip()) > 10]
@@ -194,10 +191,27 @@ class SymbolicChecker:
         )
         result.passive_voice_percent = (passive_count / total_sentences) * 100
 
-        # textstat metrics (operates on full text)
-        result.flesch_reading_ease = textstat.flesch_reading_ease(text)
-        result.flesch_kincaid_grade = textstat.flesch_kincaid_grade(text)
-        result.total_words = textstat.lexicon_count(text, removepunct=True)
+        # Mathematical NLP Metrics (immune to PDF punctuation artifacts)
+        # 1. Clean and tokenize into lowercase words
+        words = re.findall(r"\b[a-z]{2,}\b", text.lower())
+        result.total_words = len(words)
+        
+        if result.total_words > 0:
+            word_counts = Counter(words)
+            unique_words = len(word_counts)
+            
+            # Lexical Density (Type-Token Ratio)
+            result.lexical_density = (unique_words / result.total_words) * 100
+            
+            # Shannon Entropy: H = -sum(p * log2(p))
+            entropy = 0.0
+            for count in word_counts.values():
+                p = count / result.total_words
+                entropy -= p * math.log2(p)
+            result.shannon_entropy = entropy
+        else:
+            result.lexical_density = 0.0
+            result.shannon_entropy = 0.0
 
         # Flag high passive voice usage (> 20% is academically discouraged)
         if result.passive_voice_percent > 20:
@@ -206,9 +220,12 @@ class SymbolicChecker:
                 f"(recommended < 20%)"
             )
 
-        # Flag very low readability
-        if result.flesch_reading_ease < 30:
+        # Flag extremely low lexical density or entropy (suggests repetitive/filler text)
+        if result.lexical_density > 0 and result.lexical_density < 10:
             result.issues.append(
-                f"Very low readability score: {result.flesch_reading_ease:.1f} "
-                f"(Flesch-Kincaid, higher is better)"
+                f"Extremely low vocabulary richness (Lexical Density: {result.lexical_density:.1f}%). Text may be highly repetitive."
+            )
+        if result.shannon_entropy > 0 and result.shannon_entropy < 5.0:
+            result.issues.append(
+                f"Low information density (Shannon Entropy: {result.shannon_entropy:.2f} bits). Text lacks complex vocabulary distribution."
             )

@@ -149,14 +149,14 @@ class ReportGenerator:
         
         if symbolic:
             elements.append(Paragraph("<b>Statistical Metrics:</b>", heading2_style))
-            flesch = symbolic.get('flesch_reading_ease', 'N/A')
-            flesch_grade = symbolic.get('flesch_kincaid_grade', 'N/A')
+            lexical_density = symbolic.get('lexical_density', 'N/A')
+            shannon_entropy = symbolic.get('shannon_entropy', 'N/A')
             passive = symbolic.get('passive_voice_percent', 'N/A')
             
             metric_data = [
                 ["Metric", "Score", "Target Range"],
-                ["Flesch Reading Ease", str(flesch), "30 - 50 (Academic)"],
-                ["Flesch-Kincaid Grade", str(flesch_grade), "12 - 16"],
+                ["Lexical Density (TTR)", f"{lexical_density}%", "40% - 60%"],
+                ["Shannon Entropy", f"{shannon_entropy} bits", "7.0 - 9.0 (High Info Density)"],
                 ["Passive Voice Density", f"{passive}%", "< 25%"]
             ]
             
