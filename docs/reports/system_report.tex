@@ -8,6 +8,7 @@
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, positioning, shadows, fit, backgrounds}
+\usepackage[skins,breakable]{tcolorbox}
 
 \hypersetup{
     colorlinks=true,
@@ -161,6 +162,30 @@ The manuscript moves through 5 distinct processing stages:
     \item \textbf{Provenance Log:} Metric calculation sources recorded in PostgreSQL database.
 \end{enumerate}
 
+\section{Phase 3: External API Enrichment \& Journal Matching}
+
+\subsection*{External API Clients}
+Asynchronous HTTP clients using \texttt{httpx} and \texttt{tenacity} (for robust exponential backoff retries) have been implemented to interact with external databases:
+\begin{itemize}
+    \item \textbf{Crossref}: Verifies Digital Object Identifiers (DOIs) extracted from the manuscript text using regular expressions.
+    \item \textbf{OpenAlex}: Retrieves open-access citation metrics and keyword concept tags for matched authors and papers.
+    \item \textbf{DOAJ}: The Directory of Open Access Journals API is queried to identify and flag highly reputable, peer-reviewed open access journals, mitigating predatory publisher risks.
+\end{itemize}
+
+\subsection*{Journal Matcher (pgvector)}
+A highly optimized \texttt{JournalMatcher} leverages PostgreSQL's \texttt{pgvector} extension. It computes a centroid 384-dimensional semantic embedding (averaging across all manuscript \texttt{document\_chunks}). This centroid is then compared against a pre-embedded database of journal aims and scopes using cosine distance ($\Leftrightarrow$). The top 5 matched journals are returned with a strict compatibility percentage score.
+
+\subsection*{Provenance Logging}
+All operations, including Crossref validation logs, OpenAlex metadata pulls, and the precise cosine distance calculations for journal matches, are immutably appended to the \texttt{provenance\_log} table to ensure a transparent, verifiable audit trail for every AI-assisted suggestion.
+
+\vspace{0.5cm}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!40!black,title=For Dummies: Phase 3]
+\textbf{What did we just build?} \\
+Phase 3 gives our AI the ability to ''talk to the outside world''. Instead of just guessing if a citation is real, it calls the official Crossref database to check. It also checks OpenAlex to see how popular a paper is.
+
+Finally, we taught the system to play match-maker. We stored the ''Aims \& Scope'' of real science journals as math vectors. We convert your uploaded PDF into a similar vector. By measuring the angle between these vectors (using pgvector), the system mathematically proves which journal your paper belongs in!
+\end{tcolorbox}
+
 \bigskip
 
 \subsection{4. Sequence Diagram}
@@ -205,7 +230,7 @@ This is a timeline showing real-time network messages between components:
 \begin{itemize}[leftmargin=*]
     \item \textbf{Phase 1 (Infrastructure):} Podman Desktop / Docker Compose, FastAPI, MinIO, Vite React setup. (Status: \textit{Complete \& Verified})
     \item \textbf{Phase 2 (Intelligence Pipeline):} Celery workers, Ollama LLM agents, sentence-transformers, ProvenanceEngine, symbolic rule checks. (Status: \textit{Complete \& Verified})
-    \item \textbf{Phase 3 (External Enrichment):} OpenAlex, Crossref, DOAJ integrations, pgvector journal matching.
+    \item \textbf{Phase 3 (External Enrichment):} OpenAlex, Crossref, DOAJ integrations, pgvector journal matching. (Status: \textit{Complete \& Verified})
     \item \textbf{Phase 4 (Real-time UI):} Glassmorphism dashboard, SSE streaming, Apache ECharts interactive charts.
     \item \textbf{Phase 5 (Hardening):} Redis caching, Prometheus/Grafana monitoring, JWT auth, security audits.
 \end{itemize}

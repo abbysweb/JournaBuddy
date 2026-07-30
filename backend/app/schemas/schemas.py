@@ -41,6 +41,35 @@ class SymbolicCheckResult(BaseModel):
     issues: list[str] = []
 
 
+class JournalMatchResult(BaseModel):
+    """Result of pgvector journal similarity matching."""
+    journal_id: int
+    title: str
+    issn: str
+    publisher: Optional[str]
+    is_doaj_indexed: bool
+    trust_score: Optional[float]
+    compatibility_percent: float
+
+
+class CrossrefResult(BaseModel):
+    """Result of DOI verification against Crossref."""
+    doi: str
+    title: str
+    journal: str
+    publisher: str
+    is_valid: bool
+
+
+class OpenAlexResult(BaseModel):
+    """Result of citation stats fetch from OpenAlex."""
+    doi: str
+    title: str
+    citation_count: int
+    concepts: list[str] = []
+
+
+
 class AgentResult(BaseModel):
     """Result returned by a single LLM agent group."""
     agent_name: str

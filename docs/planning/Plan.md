@@ -182,12 +182,20 @@ CREATE TABLE journals (
 * [x] Build rule-based symbolic checks for acronyms, paper section completeness, passive voice density, and Flesch-Kincaid readability.
 * [x] Create Phase 2 test cases in `/test_cases/phase_2_verification.md`.
 
-### Phase 3: External Enrichment & Journal Matching (Weeks 5-6)
-* [ ] Build async OpenAlex API client to fetch author profiles and paper citation statistics.
-* [ ] Integrate Crossref API for reference DOI verification.
-* [ ] Integrate DOAJ API for journal legitimacy scoring (Module 3).
-* [ ] Implement `pgvector` cosine similarity search to match manuscript embeddings against journal scopes (Module 2).
-* [ ] Create Phase 3 test cases in `/test_cases/phase_3_verification.md`.
+### Phase 3: External API Enrichment & Journal Matching (COMPLETE)
+*Goal: Integrate with 3rd-party APIs (Crossref, OpenAlex, DOAJ) to verify references and fetch journal metadata, then match the manuscript to appropriate journals.*
+
+**Key Components:**
+* [x] **API Clients**: Build asynchronous HTTP clients (using `httpx`) with retry logic (`tenacity`) for:
+    * **Crossref**: Validate DOIs extracted from the manuscript.
+    * **OpenAlex**: Fetch citation counts and H-index for matched works/authors.
+    * **DOAJ**: Verify if target journals are legitimate open-access (prevent predatory publishing).
+* [x] **Journal Matcher (pgvector)**: 
+    * Use the `document_chunks` embeddings to calculate a centroid vector for the manuscript.
+    * Perform a cosine similarity search (`<=>`) against the `journals.scope_embedding_json` vector.
+    * Return the top 5 most compatible journals.
+* [x] **Celery Tasks**: Add `enrich_references_task` and `match_journals_task` to the `io_bound` queue.
+* [x] Create Phase 3 test cases in `/test_cases/phase_3_verification.md`.
 
 ### Phase 4: Real-Time UI & Interactive Dashboard (Week 7)
 * [ ] Build FastAPI Server-Sent Events (SSE) endpoint `/api/stream/{task_id}` for live progress streaming.

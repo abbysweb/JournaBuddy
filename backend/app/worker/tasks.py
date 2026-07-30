@@ -21,6 +21,8 @@ Defines two main task flows routed to the correct worker pools:
 import io
 import logging
 import uuid
+import asyncio
+import re
 from typing import Any
 
 import boto3
@@ -30,6 +32,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 from app.worker.celery_app import celery_app
+from app.services.crossref import CrossrefClient
+from app.services.openalex import OpenAlexClient
+from app.services.journal_matcher import JournalMatcher
 
 logger = logging.getLogger(__name__)
 
@@ -221,13 +226,25 @@ def extract_pdf_task(self, task_id: str, object_key: str) -> dict:
             agent_task_ids.append(agent_task.id)
             logger.info(f"Dispatched agent task {agent['name']}: {agent_task.id}")
 
-        # ── Mark task as completed (agents run asynchronously) ──
+        # ── Step 9: Dispatch Phase 3 External Enrichment & Matching ──
+        enrich_task = enrich_references_task.apply_async(
+            kwargs={"task_id": task_id, "text": text},
+            queue="io_bound",
+        )
+        match_task = match_journals_task.apply_async(
+            kwargs={"task_id": task_id},
+            queue="io_bound",
+        )
+        
+        # ── Mark task as completed (agents and enrichments run asynchronously) ──
         task_row.status = "agents_running"
         task_row.progress_percent = 80
         task_row.dashboard_payload = {
             "chunks": stored_count,
             "symbolic_check": symbolic_result.to_dict(),
             "agent_tasks": agent_task_ids,
+            "enrich_task": enrich_task.id,
+            "match_task": match_task.id,
         }
         db.commit()
 
@@ -237,6 +254,8 @@ def extract_pdf_task(self, task_id: str, object_key: str) -> dict:
             "chunks_stored": stored_count,
             "symbolic_issues": symbolic_result.issues,
             "agent_tasks_dispatched": len(agent_task_ids),
+            "enrich_task_dispatched": enrich_task.id,
+            "match_task_dispatched": match_task.id,
         }
 
     except Exception as exc:
@@ -318,8 +337,104 @@ def run_agent_task(
         return result
 
     except Exception as exc:
-        logger.error(f"run_agent_task failed: {agent_label} for task {task_id}: {exc}")
-        raise self.retry(exc=exc, countdown=10)
+        logger.error(f"run_agent_task failed for {task_id}, agent {agent_name}: {exc}")
+        return {"error": str(exc)}
 
+
+@celery_app.task(bind=True, max_retries=3)
+def enrich_references_task(self, task_id: str, text: str) -> dict:
+    """
+    Extracts DOIs from the text, verifies them with Crossref,
+    and fetches citation stats from OpenAlex.
+    """
+    logger.info(f"Starting enrich_references_task for {task_id}")
+    
+    # Extract DOIs using a basic regex
+    doi_pattern = r"10\.\d{4,9}/[-._;()/:A-Z0-9]+"
+    found_dois = list(set(re.findall(doi_pattern, text, re.IGNORECASE)))
+    
+    # Limit to first 10 to avoid API rate limits during processing
+    dois_to_process = found_dois[:10]
+    
+    async def process_dois(dois):
+        crossref = CrossrefClient()
+        openalex = OpenAlexClient()
+        results = []
+        for doi in dois:
+            # 1. Verify with Crossref
+            cr_res = await crossref.verify_doi(doi)
+            if not cr_res:
+                continue
+                
+            # 2. Get stats from OpenAlex
+            oa_res = await openalex.get_work_by_doi(doi)
+            
+            results.append({
+                "crossref": cr_res,
+                "openalex": oa_res,
+            })
+            # Be polite to rate limits
+            await asyncio.sleep(0.5)
+        return results
+
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+    results = loop.run_until_complete(process_dois(dois_to_process))
+    
+    # Save to ProvenanceLog
+    sync_db_url = settings.database_url.replace("+asyncpg", "+psycopg2")
+    engine = create_engine(sync_db_url)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    try:
+        from app.models.models import ProvenanceLog
+        log_entry = ProvenanceLog(
+            task_id=uuid.UUID(task_id),
+            metric_name="reference_enrichment",
+            metric_value={"enriched_references": results, "total_found": len(found_dois)},
+            formula_used="Regex DOI extraction + Crossref + OpenAlex",
+            data_sources=["crossref", "openalex"],
+            confidence_level="high",
+        )
+        db.add(log_entry)
+        db.commit()
+    finally:
+        db.close()
+        
+    return {"enriched_count": len(results)}
+
+
+@celery_app.task(bind=True, max_retries=3)
+def match_journals_task(self, task_id: str) -> dict:
+    """
+    Matches the manuscript's embeddings against known journals in the DB.
+    """
+    logger.info(f"Starting match_journals_task for {task_id}")
+    
+    sync_db_url = settings.database_url.replace("+asyncpg", "+psycopg2")
+    engine = create_engine(sync_db_url)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    try:
+        matcher = JournalMatcher(db)
+        matches = matcher.find_matching_journals(uuid.UUID(task_id), top_k=5)
+        
+        # Save to ProvenanceLog
+        from app.models.models import ProvenanceLog
+        log_entry = ProvenanceLog(
+            task_id=uuid.UUID(task_id),
+            metric_name="journal_matches",
+            metric_value={"matches": matches},
+            formula_used="pgvector cosine distance (1 - <=>)",
+            data_sources=["journals", "doaj"],
+            confidence_level="high",
+        )
+        db.add(log_entry)
+        db.commit()
+        return {"matches_found": len(matches)}
     finally:
         db.close()

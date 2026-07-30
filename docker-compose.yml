@@ -38,6 +38,8 @@ services:
   worker-io:
     build: ./backend
     command: celery -A app.worker.celery_app worker -Q io_bound -c 4 --loglevel=info
+    volumes:
+      - ./backend/app:/app/app
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
@@ -51,12 +53,12 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       - redis
-      - minio
-      - postgres
 
   worker-llm:
     build: ./backend
-    command: celery -A app.worker.celery_app worker -Q llm_bound -c 3 --loglevel=info
+    command: celery -A app.worker.celery_app worker -Q llm_bound -c 4 --loglevel=info
+    volumes:
+      - ./backend/app:/app/app
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
