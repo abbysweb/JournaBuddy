@@ -78,7 +78,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '32px' }}>
         
         {/* Radar Chart */}
         <div className="glass-panel">
@@ -93,7 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             Mathematical evaluation of text complexity based on Flesch-Kincaid and symbolic grammar rules.<br/>
             <span style={{ opacity: 0.8 }}><strong>Note:</strong> A standard academic paper scores between 0 and 30. Negative scores (e.g., -600) indicate extreme edge cases caused by unparsed data tables, reference blocks, or missing punctuation in the PDF extraction.</span>
           </p>
-          <ReactECharts option={readabilityOptions} style={{ height: '250px' }} opts={{ renderer: 'svg' }} />
+          <ReactECharts option={readabilityOptions} style={{ height: '400px' }} opts={{ renderer: 'svg' }} />
         </div>
 
         {/* Bar Chart */}
@@ -109,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             Journals statistically most likely to accept your manuscript based on semantic scope similarity.<br/>
             <span style={{ opacity: 0.8 }}><strong>Compatibility %:</strong> Derived from the mathematical cosine distance between your paper's AI embeddings and the journal's published topics. Higher is a better match.</span>
           </p>
-          <ReactECharts option={journalOptions} style={{ height: '250px' }} opts={{ renderer: 'svg' }} />
+          <ReactECharts option={journalOptions} style={{ height: '400px' }} opts={{ renderer: 'svg' }} />
         </div>
       </div>
 
@@ -126,7 +126,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
           <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Qualitative analysis produced by local Language Models evaluating intelligence, rigor, and compliance.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '24px' }}>
             {Object.entries(agents).map(([agentName, agentData]: [string, any]) => (
               <div key={agentName} style={{ background: 'rgba(0,0,0,0.03)', padding: '16px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
                 <h4 style={{ color: 'var(--accent-primary)', marginBottom: '12px', textTransform: 'capitalize' }}>
