@@ -83,13 +83,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
         {/* Radar Chart */}
         <div className="glass-panel">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <BookOpen color="var(--accent-primary)" size={20} />
+            <BookOpen color="var(--accent-primary)" size={24} />
             <h3 style={{ margin: 0 }}>Linguistic Integrity</h3>
             <span title="Measures sentence complexity, passive voice usage, and formatting correctness to ensure high academic readability." style={{ cursor: 'help' }}>
-              <Info size={16} color="var(--text-secondary)" />
+              <Info size={20} color="var(--text-secondary)" />
             </span>
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Mathematical evaluation of text complexity based on Flesch-Kincaid and symbolic grammar rules.<br/>
             <span style={{ opacity: 0.8 }}><strong>Note:</strong> A standard academic paper scores between 0 and 30. Negative scores (e.g., -600) indicate extreme edge cases caused by unparsed data tables, reference blocks, or missing punctuation in the PDF extraction.</span>
           </p>
@@ -99,13 +99,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
         {/* Bar Chart */}
         <div className="glass-panel">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <FileText color="var(--accent-secondary)" size={20} />
+            <FileText color="var(--accent-secondary)" size={24} />
             <h3 style={{ margin: 0 }}>Top Journal Matches</h3>
             <span title="Uses pgvector cosine distance to compare your manuscript's semantic embeddings against a database of Open Access journals." style={{ cursor: 'help' }}>
-              <Info size={16} color="var(--text-secondary)" />
+              <Info size={20} color="var(--text-secondary)" />
             </span>
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Journals statistically most likely to accept your manuscript based on semantic scope similarity.<br/>
             <span style={{ opacity: 0.8 }}><strong>Compatibility %:</strong> Derived from the mathematical cosine distance between your paper's AI embeddings and the journal's published topics. Higher is a better match.</span>
           </p>
@@ -117,13 +117,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
       {Object.keys(agents).length > 0 && (
         <div className="glass-panel">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <Brain color="#ec4899" size={20} />
+            <Brain color="#ec4899" size={24} />
             <h3 style={{ margin: 0 }}>LLM Agent Evaluations</h3>
             <span title="Results from Ollama Llama 3 agents running specialized academic peer-review prompts." style={{ cursor: 'help' }}>
-              <Info size={16} color="var(--text-secondary)" />
+              <Info size={20} color="var(--text-secondary)" />
             </span>
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Qualitative analysis produced by local Language Models evaluating intelligence, rigor, and compliance.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
@@ -133,9 +133,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
                   {agentName.replace('_', ' ')}
                 </h4>
                 {agentData.status === 'degraded' ? (
-                  <p style={{ color: 'var(--warning)', fontSize: '0.9rem' }}>API unavailable. Returning degraded result.</p>
+                  <p style={{ color: 'var(--warning)', fontSize: '1.05rem' }}>API unavailable. Returning degraded result.</p>
                 ) : (
-                  <ul style={{ fontSize: '0.9rem', color: 'var(--text-primary)', paddingLeft: '20px' }}>
+                  <ul style={{ fontSize: '1.05rem', color: 'var(--text-primary)', paddingLeft: '20px' }}>
                     {Object.entries(agentData).map(([key, val]) => (
                       <li key={key} style={{ marginBottom: '8px' }}>
                         <strong style={{ color: 'var(--text-secondary)' }}>{key}: </strong> 
@@ -154,23 +154,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
       {references.length > 0 && (
         <div className="glass-panel">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <Link color="#10b981" size={20} />
+            <Link color="#10b981" size={24} />
             <h3 style={{ margin: 0 }}>Reference Verifications (Crossref / OpenAlex)</h3>
             <span title="DOIs extracted from your text were validated via Crossref API and enriched with citation counts from OpenAlex." style={{ cursor: 'help' }}>
-              <Info size={16} color="var(--text-secondary)" />
+              <Info size={20} color="var(--text-secondary)" />
             </span>
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Automated verification of your citations to ensure they are valid DOIs and are highly cited.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
             {references.map((ref: any, idx: number) => (
               <div key={idx} style={{ padding: '12px', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <strong style={{ fontSize: '0.95rem' }}>{ref.crossref?.title || "Unknown Title"}</strong>
+                  <strong style={{ fontSize: '1.1rem' }}>{ref.crossref?.title || "Unknown Title"}</strong>
                   {ref.crossref?.is_valid ? <CheckCircle size={18} color="var(--success)" /> : <AlertTriangle size={18} color="var(--danger)" />}
                 </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <div style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>
                   <span>DOI: {ref.crossref?.doi}</span> | 
                   <span style={{ marginLeft: '8px', color: 'var(--accent-primary)' }}>Citations: {ref.openalex?.citation_count || 0}</span>
                 </div>
@@ -183,13 +183,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
       {/* Issues Panel */}
       <div className="glass-panel">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <AlertTriangle color="var(--warning)" size={20} />
+          <AlertTriangle color="var(--warning)" size={24} />
           <h3 style={{ margin: 0 }}>Symbolic Review Findings</h3>
           <span title="Deterministic rule-based checks that scan for acronym definitions, missing sections, and hardcoded logic flaws." style={{ cursor: 'help' }}>
-            <Info size={16} color="var(--text-secondary)" />
+            <Info size={20} color="var(--text-secondary)" />
           </span>
         </div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+        <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
           Strict rule violations that could lead to immediate editorial rejection.
         </p>
         {symbolic.issues && symbolic.issues.length > 0 ? (
@@ -197,7 +197,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             {symbolic.issues.map((issue: string, idx: number) => (
               <div key={idx} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', background: 'rgba(239, 68, 68, 0.1)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
                 <AlertTriangle color="var(--danger)" size={20} style={{ flexShrink: 0 }} />
-                <span style={{ fontSize: '0.95rem' }}>{issue}</span>
+                <span style={{ fontSize: '1.1rem' }}>{issue}</span>
               </div>
             ))}
           </div>
