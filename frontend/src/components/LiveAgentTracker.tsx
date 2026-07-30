@@ -27,23 +27,37 @@ export const LiveAgentTracker: React.FC<LiveAgentTrackerProps> = ({ taskId, onCo
           return;
         }
 
+        const getActionMessage = (percent: number, stat: string) => {
+          if (stat === 'completed') return "Pipeline complete. Assembling final dashboard payload...";
+          if (stat === 'failed') return "Analysis failed! Check backend logs.";
+          if (stat === 'agents_running') return "Waiting for AI Agents and External APIs to complete analysis...";
+          if (percent <= 10) return "Initializing pipeline & updating database...";
+          if (percent <= 25) return "Extracting text from MinIO PDF bytes via pdfplumber...";
+          if (percent <= 40) return "Performing semantic chunking on extracted text...";
+          if (percent <= 60) return "Generating sentence-transformer embeddings and indexing to pgvector...";
+          if (percent <= 75) return "Executing deterministic symbolic rule checks and logging provenance...";
+          return "Dispatching LLM agents (Ollama/NIM) and external citation verifications (Crossref/OpenAlex)...";
+        };
+
         if (data.progress_percent !== progressRef.current) {
           setProgress(data.progress_percent);
           progressRef.current = data.progress_percent;
           // Only log significant progress jumps to avoid spamming
           if (data.progress_percent % 10 === 0 || data.progress_percent === 100) {
-             setLogs(prev => [...prev, `[SYSTEM] Processing... ${data.progress_percent}% complete.`]);
+             setLogs(prev => [...prev, `[SYSTEM] ${getActionMessage(data.progress_percent, data.status)}`]);
           }
         }
         
         if (data.status !== statusRef.current) {
           setStatus(data.status);
           statusRef.current = data.status;
-          setLogs(prev => [...prev, `[SYSTEM] Pipeline status changed to: ${data.status.toUpperCase()}`]);
+          if (data.status === 'agents_running') {
+             setLogs(prev => [...prev, `[SYSTEM] ${getActionMessage(data.progress_percent, data.status)}`]);
+          }
         }
 
         if (data.status === 'completed') {
-          setLogs(prev => [...prev, '[SYSTEM] Analysis completed successfully. Generating dashboard...']);
+          setLogs(prev => [...prev, `[SYSTEM] ${getActionMessage(data.progress_percent, data.status)}`]);
           eventSource.close();
           setTimeout(() => {
             onComplete(data.dashboard_payload);
