@@ -286,7 +286,57 @@ To establish JournaBuddy as a state-of-the-art research intelligence platform, t
 
 ---
 
-## 9. Verification & Automated Commit Protocols
+## 9. Phase 6: Advanced Statistical NLP & Explainable Prediction Models (Future Roadmap)
+
+To elevate JournaBuddy to a true research-grade enterprise platform, the system will move beyond baseline heuristics and single-model predictions into a multi-dimensional, statistically defensible architecture.
+
+### 9.1 Readability & Lexical Richness Upgrade
+*   **SMOG Index:** Replace baseline grade calculations with SMOG ($1.043\sqrt{30\frac{P}{S}}+3.1291$), the gold standard for academic writing.
+*   **Gunning Fog:** Add widely recognized scientific publishing readability metrics.
+*   **MATTR / MTLD:** Replace basic Type-Token Ratio (TTR) with Moving-Average TTR to prevent document-length bias.
+*   **Flesch Reading Ease:** Re-introduce as a baseline score.
+
+### 9.2 Statistical NLP & Semantic Similarity
+*   **BM25 Search:** Upgrade from pure TF-IDF to BM25 for keyword extraction and topic modeling.
+*   **BERTopic / NMF:** Implement Non-negative Matrix Factorization and BERTopic (Embeddings + HDBSCAN) for interpretable, clustering-based topic detection.
+*   **Cross-Encoder Reranking:** Upgrade the Journal Matcher pipeline. Instead of relying solely on `sentence-transformers` cosine similarity, route the top 50 results through a Cross-Encoder (e.g., `ms-marco-MiniLM-L6-v2`) for highly accurate semantic reranking.
+
+### 9.3 Ensemble Acceptance Prediction Models
+Instead of a solitary Logistic Regression baseline, JournaBuddy will train and compare a stacked ensemble:
+*   **XGBoost:** Primary model for extreme performance on classical academic features.
+*   **Random Forest:** Benchmark model (interpretable, non-linear).
+*   **Logistic Regression:** Preserved as a statistical baseline.
+*   **Dynamic Feature Weighting:** Use XGBoost to learn and justify weights automatically (e.g., Novelty 0.29, Journal Fit 0.24, Methods 0.18) rather than hardcoding percentages.
+*   **Bayesian Confidence Intervals:** Output predictions scientifically (e.g., $81\%$ Acceptance with a $95\%$ Confidence Interval of $76\%-85\%$).
+
+### 9.4 SHAP Explainability
+*   Every model prediction will be passed through **SHAP (SHapley Additive exPlanations)**.
+*   Instead of a raw percentage, authors will see exactly *why* their score dropped (e.g., $+ \text{Excellent journal fit}$, $- \text{Weak discussion}$).
+
+---
+
+## 10. Phase 7: Plagiarism, Reference, & Enterprise Scaling (Future Roadmap)
+
+### 10.1 Multi-Dimensional Plagiarism Detection
+*   Upgrade the internal `pgvector` plagiarism checker by combining **Cosine Similarity** with **Jaccard Similarity**, **MinHash**, and **Levenshtein Distance** to detect diverse forms of plagiarism (paraphrasing, copy-pasting, syntax shuffling).
+
+### 10.2 Deep Reference Analysis
+*   **Reference Freshness:** $\frac{\text{References within 5 years}}{\text{Total References}}$
+*   **Citation Diversity:** Compute Shannon Entropy of cited journals/publishers.
+*   **Self-Citation Ratio:** Flag authors over-citing their own prior work.
+*   **DOI Completeness \& Broken Link Rates.**
+
+### 10.3 Novelty \& Statistical Outliers
+*   Implement **Isolation Forest** or **Local Outlier Factor (LOF)**. 
+*   True novelty in science is a statistical anomaly. Papers that sit on the far edge of the embedding clusters will be mathematically flagged as highly novel.
+
+### 10.4 Model Evaluation \& Calibration
+*   All future ML models will be rigorously evaluated against classification (ROC-AUC, PR-AUC, F1), regression (RMSE, R²), and ranking metrics (NDCG@10 for journal matching).
+*   **Important Caveat:** True acceptance prediction requires tens of thousands of labeled historical manuscripts. Until that dataset is acquired, the output will be framed as a **Submission Suitability Score** rather than a guaranteed acceptance probability.
+
+---
+
+## 11. Verification & Automated Commit Protocols
 
 Following the system execution rules:
 1. **Verification First:** Each phase must be verified using the specific test cases in `test_cases/phase_X_verification.md`.
