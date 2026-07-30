@@ -1,7 +1,8 @@
 import io
 import uuid
 import datetime
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
@@ -13,11 +14,12 @@ from app.models.models import Task
 class ReportGenerator:
     """Generates a highly detailed PDF Manuscript Proof Report using ReportLab."""
     
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
         
-    def generate_pdf(self, task_id: uuid.UUID) -> bytes:
-        task = self.db.query(Task).filter(Task.id == task_id).first()
+    async def generate_pdf(self, task_id: uuid.UUID) -> bytes:
+        result = await self.db.execute(select(Task).where(Task.id == task_id))
+        task = result.scalars().first()
         if not task:
             raise ValueError(f"Task {task_id} not found")
             
