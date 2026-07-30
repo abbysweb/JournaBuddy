@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
-import { BookOpen, CheckCircle, AlertTriangle, FileText, Brain, Link, Info } from 'lucide-react';
+import { BookOpen, CheckCircle, AlertTriangle, FileText, Brain, Link, Info, Download } from 'lucide-react';
+import { CitationGraph } from './CitationGraph';
 
 interface DashboardProps {
   payload: any;
+  taskId?: string | null;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ payload, taskId }) => {
   if (!payload) return null;
 
   const symbolic = payload.symbolic_check || {};
@@ -72,12 +74,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
           colorStops: [{ offset: 0, color: '#3b82f6' }, { offset: 1, color: '#8b5cf6' }]
         }
       }
+    },
+    {
+      name: 'Acceptance Likelihood',
+      type: 'bar',
+      data: matches.map((m: any) => m.acceptance_likelihood_percent || 0).reverse(),
+      itemStyle: {
+        borderRadius: [0, 4, 4, 0],
+        color: '#10b981'
+      }
     }]
   };
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
+      {/* PDF Export Button */}
+      {taskId && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-8px' }}>
+          <button 
+            onClick={() => window.open(`http://localhost:8000/api/report/${taskId}`, '_blank')}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 4px 6px rgba(59, 130, 246, 0.25)' }}
+          >
+            <Download size={18} />
+            Download PDF Proof Report
+          </button>
+        </div>
+      )}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '32px' }}>
         
         {/* Radar Chart */}
@@ -150,7 +174,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
         </div>
       )}
 
-      {/* Reference Enrichment Panel */}
+      {/* Reference Enrichment Panel with Citation Graph */}
       {references.length > 0 && (
         <div className="glass-panel">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -176,6 +200,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
                 </div>
               </div>
             ))}
+          </div>
+          
+          <div style={{ marginTop: '24px' }}>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '12px' }}>3D Citation Network (vis-network)</h4>
+            <CitationGraph references={references} />
           </div>
         </div>
       )}

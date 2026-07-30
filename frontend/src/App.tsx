@@ -50,7 +50,7 @@ function App() {
                 Analyze Another Paper
               </button>
             </div>
-            <Dashboard payload={dashboardPayload} />
+            <Dashboard payload={dashboardPayload} taskId={taskId} />
           </div>
         )}
       </main>
