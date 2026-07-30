@@ -26,9 +26,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
         { name: 'Definitions', max: 100 }
       ],
       shape: 'circle',
-      splitArea: { areaStyle: { color: ['rgba(255,255,255,0.02)', 'rgba(255,255,255,0.05)'] } },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } }
+      splitArea: { areaStyle: { color: ['rgba(0,0,0,0.02)', 'rgba(0,0,0,0.05)'] } },
+      axisLine: { lineStyle: { color: 'rgba(0,0,0,0.2)' } },
+      splitLine: { lineStyle: { color: 'rgba(0,0,0,0.2)' } }
     },
     series: [{
       type: 'radar',
@@ -53,13 +53,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
     xAxis: { 
       type: 'value', 
       name: 'Compatibility %',
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } },
-      axisLabel: { color: '#94a3b8' }
+      splitLine: { lineStyle: { color: 'rgba(0,0,0,0.1)' } },
+      axisLabel: { color: '#475569' }
     },
     yAxis: { 
       type: 'category', 
       data: matches.map((m: any) => m.title).reverse(),
-      axisLabel: { color: '#f8fafc', width: 100, overflow: 'truncate' }
+      axisLabel: { color: '#0f172a', width: 100, overflow: 'truncate' }
     },
     series: [{
       name: 'Compatibility',
@@ -93,7 +93,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             Mathematical evaluation of text complexity based on Flesch-Kincaid and symbolic grammar rules.<br/>
             <span style={{ opacity: 0.8 }}><strong>Note:</strong> A standard academic paper scores between 0 and 30. Negative scores (e.g., -600) indicate extreme edge cases caused by unparsed data tables, reference blocks, or missing punctuation in the PDF extraction.</span>
           </p>
-          <ReactECharts option={readabilityOptions} style={{ height: '250px' }} theme="dark" opts={{ renderer: 'svg' }} />
+          <ReactECharts option={readabilityOptions} style={{ height: '250px' }} opts={{ renderer: 'svg' }} />
         </div>
 
         {/* Bar Chart */}
@@ -109,7 +109,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             Journals statistically most likely to accept your manuscript based on semantic scope similarity.<br/>
             <span style={{ opacity: 0.8 }}><strong>Compatibility %:</strong> Derived from the mathematical cosine distance between your paper's AI embeddings and the journal's published topics. Higher is a better match.</span>
           </p>
-          <ReactECharts option={journalOptions} style={{ height: '250px' }} theme="dark" opts={{ renderer: 'svg' }} />
+          <ReactECharts option={journalOptions} style={{ height: '250px' }} opts={{ renderer: 'svg' }} />
         </div>
       </div>
 
@@ -128,7 +128,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
             {Object.entries(agents).map(([agentName, agentData]: [string, any]) => (
-              <div key={agentName} style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+              <div key={agentName} style={{ background: 'rgba(0,0,0,0.03)', padding: '16px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
                 <h4 style={{ color: 'var(--accent-primary)', marginBottom: '12px', textTransform: 'capitalize' }}>
                   {agentName.replace('_', ' ')}
                 </h4>
