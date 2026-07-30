@@ -78,7 +78,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
         
         {/* Radar Chart */}
         <div className="glass-panel">
@@ -126,7 +126,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Qualitative analysis produced by local Language Models evaluating intelligence, rigor, and compliance.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
             {Object.entries(agents).map(([agentName, agentData]: [string, any]) => (
               <div key={agentName} style={{ background: 'rgba(0,0,0,0.03)', padding: '16px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
                 <h4 style={{ color: 'var(--accent-primary)', marginBottom: '12px', textTransform: 'capitalize' }}>
