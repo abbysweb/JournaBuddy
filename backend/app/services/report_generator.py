@@ -151,14 +151,24 @@ class ReportGenerator:
             elements.append(Paragraph("<b>Statistical Metrics:</b>", heading2_style))
             lexical_density = symbolic.get('lexical_density', 'N/A')
             shannon_entropy = symbolic.get('shannon_entropy', 'N/A')
+            simpson = symbolic.get('simpson_diversity_index', 'N/A')
+            coleman = symbolic.get('coleman_liau_index', 'N/A')
+            jaccard = symbolic.get('jaccard_similarity', 'N/A')
             passive = symbolic.get('passive_voice_percent', 'N/A')
+            keywords = symbolic.get('top_keywords', [])
             
             metric_data = [
                 ["Metric", "Score", "Target Range"],
                 ["Lexical Density (TTR)", f"{lexical_density}%", "40% - 60%"],
                 ["Shannon Entropy", f"{shannon_entropy} bits", "7.0 - 9.0 (High Info Density)"],
+                ["Simpson's Diversity Index", str(simpson), "0.8 - 0.99 (Vocabulary Richness)"],
+                ["Coleman-Liau Grade", str(coleman), "12 - 16 (Academic)"],
+                ["Intro/Conclusion Jaccard Redundancy", f"{jaccard}%", "< 15% (Low Plagiarism)"],
                 ["Passive Voice Density", f"{passive}%", "< 25%"]
             ]
+            
+            if keywords:
+                metric_data.append(["Extracted TF Keywords", ", ".join(keywords), "N/A"])
             
             t = Table(metric_data, colWidths=[200, 100, 150])
             t.setStyle(TableStyle([

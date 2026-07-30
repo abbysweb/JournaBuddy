@@ -63,6 +63,10 @@ class SymbolicCheckResult:
         passive_voice_percent: Estimated percentage of passive voice sentences.
         lexical_density: Ratio of unique words to total words (vocabulary richness).
         shannon_entropy: Mathematical information density of the vocabulary (bits/word).
+        simpson_diversity_index: Mathematical measure of vocabulary repetition.
+        coleman_liau_index: PDF-safe grade level metric based on characters.
+        jaccard_similarity: Redundancy overlap between start and end of paper.
+        top_keywords: Mathematically extracted significant words using Term Frequency.
         total_words: Total word count of the document.
         issues: Human-readable list of all detected problems.
     """
@@ -73,6 +77,10 @@ class SymbolicCheckResult:
     passive_voice_percent: float = 0.0
     lexical_density: float = 0.0
     shannon_entropy: float = 0.0
+    simpson_diversity_index: float = 0.0
+    coleman_liau_index: float = 0.0
+    jaccard_similarity: float = 0.0
+    top_keywords: list[str] = field(default_factory=list)
     total_words: int = 0
     issues: list[str] = field(default_factory=list)
 
@@ -86,6 +94,10 @@ class SymbolicCheckResult:
             "passive_voice_percent": round(self.passive_voice_percent, 2),
             "lexical_density": round(self.lexical_density, 2),
             "shannon_entropy": round(self.shannon_entropy, 2),
+            "simpson_diversity_index": round(self.simpson_diversity_index, 4),
+            "coleman_liau_index": round(self.coleman_liau_index, 2),
+            "jaccard_similarity": round(self.jaccard_similarity, 2),
+            "top_keywords": self.top_keywords,
             "total_words": self.total_words,
             "issues": self.issues,
         }
@@ -203,15 +215,44 @@ class SymbolicChecker:
             # Lexical Density (Type-Token Ratio)
             result.lexical_density = (unique_words / result.total_words) * 100
             
-            # Shannon Entropy: H = -sum(p * log2(p))
+            # Shannon Entropy & Simpson's Diversity Index
             entropy = 0.0
+            simpson_sum = 0.0
             for count in word_counts.values():
                 p = count / result.total_words
                 entropy -= p * math.log2(p)
+                simpson_sum += (count / result.total_words) ** 2
+                
             result.shannon_entropy = entropy
+            result.simpson_diversity_index = 1.0 - simpson_sum
+            
+            # Term Frequency (Keyword Extraction)
+            stop_words = {"the", "and", "of", "to", "in", "a", "is", "that", "for", "it", "with", "as", "on", "was", "are", "by", "this", "an", "be", "from", "at", "which", "or", "have", "not", "but"}
+            valid_words = [(w, c) for w, c in word_counts.items() if w not in stop_words and len(w) > 3]
+            valid_words.sort(key=lambda x: x[1], reverse=True)
+            result.top_keywords = [w[0] for w in valid_words[:7]]
+            
         else:
             result.lexical_density = 0.0
             result.shannon_entropy = 0.0
+            result.simpson_diversity_index = 0.0
+            
+        # Coleman-Liau Index (Character-based readability)
+        letters = sum(c.isalpha() for c in text)
+        if result.total_words > 0:
+            L = (letters / result.total_words) * 100
+            S = (total_sentences / result.total_words) * 100
+            result.coleman_liau_index = 0.0588 * L - 0.296 * S - 15.8
+            
+        # Jaccard Similarity (Self-Plagiarism / Redundancy Check)
+        if len(words) > 600:
+            start_words = set(words[:300])
+            end_words = set(words[-300:])
+            intersection = len(start_words.intersection(end_words))
+            union = len(start_words.union(end_words))
+            result.jaccard_similarity = (intersection / union) * 100 if union > 0 else 0.0
+        else:
+            result.jaccard_similarity = 0.0
 
         # Flag high passive voice usage (> 20% is academically discouraged)
         if result.passive_voice_percent > 20:
