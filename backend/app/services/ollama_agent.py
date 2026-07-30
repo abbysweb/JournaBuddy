@@ -48,7 +48,7 @@ class OllamaAgent:
     falling to the next provider. If all providers fail, raises AgentError.
     """
 
-    def __init__(self, timeout: float = 60.0):
+    def __init__(self, timeout: float = 300.0):
         self.timeout = timeout
 
     def run(self, agent_name: str, prompt: str, schema: dict) -> dict:
