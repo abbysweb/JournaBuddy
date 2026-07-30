@@ -53,9 +53,21 @@ Instead of guessing whether a manuscript will be rejected due to poor formatting
 
 \bigskip
 
+\section{Continuous Implementation Roadmap}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Phase 1 (Infrastructure):} Podman Desktop / Docker Compose, FastAPI, MinIO, Vite React setup. (Status: \textit{Complete \& Verified})
+    \item \textbf{Phase 2 (Intelligence Pipeline):} Celery workers, Ollama LLM agents, sentence-transformers, ProvenanceEngine, symbolic rule checks. (Status: \textit{Complete \& Verified})
+    \item \textbf{Phase 3 (External Enrichment):} OpenAlex, Crossref, DOAJ integrations, pgvector journal matching. (Status: \textit{Complete \& Verified})
+    \item \textbf{Phase 4 (Real-time UI):} Glassmorphism dashboard, SSE streaming, Apache ECharts interactive charts.
+    \item \textbf{Phase 5 (Hardening):} Redis caching, Prometheus/Grafana monitoring, JWT auth, security audits.
+\end{itemize}
+
+\bigskip
+
 \section{System Diagrams \& Visual Architecture}
 
-\subsection{1. Use Case Diagram}
+\subsection{3.1 Use Case Diagram}
 The Use Case Diagram shows all primary interactions between scientific authors, external academic services, and the JournaBuddy system.
 
 \begin{center}
@@ -94,7 +106,7 @@ Think of this diagram as a service interaction menu:
 
 \bigskip
 
-\subsection{2. System Architecture Diagram}
+\subsection{3.2 System Architecture Diagram}
 The System Architecture Diagram displays the multi-tier containerized stack powering JournaBuddy.
 
 \begin{center}
@@ -129,7 +141,7 @@ Imagine JournaBuddy as a 5-story containerized stack:
 
 \bigskip
 
-\subsection{3. Data Flow Diagram (DFD)}
+\subsection{3.3 Data Flow Diagram (DFD)}
 The Data Flow Diagram tracks how an uploaded paper moves through processing stages and transforms into score reports.
 
 \begin{center}
@@ -162,33 +174,9 @@ The manuscript moves through 5 distinct processing stages:
     \item \textbf{Provenance Log:} Metric calculation sources recorded in PostgreSQL database.
 \end{enumerate}
 
-\section{Phase 3: External API Enrichment \& Journal Matching}
-
-\subsection*{External API Clients}
-Asynchronous HTTP clients using \texttt{httpx} and \texttt{tenacity} (for robust exponential backoff retries) have been implemented to interact with external databases:
-\begin{itemize}
-    \item \textbf{Crossref}: Verifies Digital Object Identifiers (DOIs) extracted from the manuscript text using regular expressions.
-    \item \textbf{OpenAlex}: Retrieves open-access citation metrics and keyword concept tags for matched authors and papers.
-    \item \textbf{DOAJ}: The Directory of Open Access Journals API is queried to identify and flag highly reputable, peer-reviewed open access journals, mitigating predatory publisher risks.
-\end{itemize}
-
-\subsection*{Journal Matcher (pgvector)}
-A highly optimized \texttt{JournalMatcher} leverages PostgreSQL's \texttt{pgvector} extension. It computes a centroid 384-dimensional semantic embedding (averaging across all manuscript \texttt{document\_chunks}). This centroid is then compared against a pre-embedded database of journal aims and scopes using cosine distance ($\Leftrightarrow$). The top 5 matched journals are returned with a strict compatibility percentage score.
-
-\subsection*{Provenance Logging}
-All operations, including Crossref validation logs, OpenAlex metadata pulls, and the precise cosine distance calculations for journal matches, are immutably appended to the \texttt{provenance\_log} table to ensure a transparent, verifiable audit trail for every AI-assisted suggestion.
-
-\vspace{0.5cm}
-\begin{tcolorbox}[colback=blue!5,colframe=blue!40!black,title=For Dummies: Phase 3]
-\textbf{What did we just build?} \\
-Phase 3 gives our AI the ability to ''talk to the outside world''. Instead of just guessing if a citation is real, it calls the official Crossref database to check. It also checks OpenAlex to see how popular a paper is.
-
-Finally, we taught the system to play match-maker. We stored the ''Aims \& Scope'' of real science journals as math vectors. We convert your uploaded PDF into a similar vector. By measuring the angle between these vectors (using pgvector), the system mathematically proves which journal your paper belongs in!
-\end{tcolorbox}
-
 \bigskip
 
-\subsection{4. Sequence Diagram}
+\subsection{3.4 Sequence Diagram}
 The Sequence Diagram displays the exact order of network messages between components during a live upload.
 
 \begin{center}
@@ -223,19 +211,7 @@ This is a timeline showing real-time network messages between components:
     \item FastAPI streams real-time progress right back to your screen over SSE.
 \end{enumerate}
 
-\bigskip
-
-\section{Continuous Implementation Roadmap}
-
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Phase 1 (Infrastructure):} Podman Desktop / Docker Compose, FastAPI, MinIO, Vite React setup. (Status: \textit{Complete \& Verified})
-    \item \textbf{Phase 2 (Intelligence Pipeline):} Celery workers, Ollama LLM agents, sentence-transformers, ProvenanceEngine, symbolic rule checks. (Status: \textit{Complete \& Verified})
-    \item \textbf{Phase 3 (External Enrichment):} OpenAlex, Crossref, DOAJ integrations, pgvector journal matching. (Status: \textit{Complete \& Verified})
-    \item \textbf{Phase 4 (Real-time UI):} Glassmorphism dashboard, SSE streaming, Apache ECharts interactive charts.
-    \item \textbf{Phase 5 (Hardening):} Redis caching, Prometheus/Grafana monitoring, JWT auth, security audits.
-\end{itemize}
-
-\bigskip
+\newpage
 
 \section{Phase 2: Intelligence Pipeline Components}
 
@@ -261,5 +237,31 @@ Three deterministic rule-based modules:
 
 \subsection*{ProvenanceEngine}
 Records every metric to the \texttt{provenance\_log} table with: formula used, data sources, confidence level, and raw input snapshot. This ensures every score in JournaBuddy is fully explainable, auditable, and reproducible.
+
+\bigskip
+
+\section{Phase 3: External API Enrichment \& Journal Matching}
+
+\subsection*{External API Clients}
+Asynchronous HTTP clients using \texttt{httpx} and \texttt{tenacity} (for robust exponential backoff retries) have been implemented to interact with external databases:
+\begin{itemize}
+    \item \textbf{Crossref}: Verifies Digital Object Identifiers (DOIs) extracted from the manuscript text using regular expressions.
+    \item \textbf{OpenAlex}: Retrieves open-access citation metrics and keyword concept tags for matched authors and papers.
+    \item \textbf{DOAJ}: The Directory of Open Access Journals API is queried to identify and flag highly reputable, peer-reviewed open access journals, mitigating predatory publisher risks.
+\end{itemize}
+
+\subsection*{Journal Matcher (pgvector)}
+A highly optimized \texttt{JournalMatcher} leverages PostgreSQL's \texttt{pgvector} extension. It computes a centroid 384-dimensional semantic embedding (averaging across all manuscript \texttt{document\_chunks}). This centroid is then compared against a pre-embedded database of journal aims and scopes using cosine distance ($\Leftrightarrow$). The top 5 matched journals are returned with a strict compatibility percentage score.
+
+\subsection*{Provenance Logging}
+All operations, including Crossref validation logs, OpenAlex metadata pulls, and the precise cosine distance calculations for journal matches, are immutably appended to the \texttt{provenance\_log} table to ensure a transparent, verifiable audit trail for every AI-assisted suggestion.
+
+\vspace{0.5cm}
+\begin{tcolorbox}[colback=blue!5,colframe=blue!40!black,title=For Dummies: Phase 3]
+\textbf{What did we just build?} \\
+Phase 3 gives our AI the ability to ``talk to the outside world''. Instead of just guessing if a citation is real, it calls the official Crossref database to check. It also checks OpenAlex to see how popular a paper is.
+
+Finally, we taught the system to play match-maker. We stored the ``Aims \& Scope'' of real science journals as math vectors. We convert your uploaded PDF into a similar vector. By measuring the angle between these vectors (using pgvector), the system mathematically proves which journal your paper belongs in!
+\end{tcolorbox}
 
 \end{document}
