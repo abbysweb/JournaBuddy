@@ -345,10 +345,23 @@ def enrich_references_task(self, task_id: str, text: str) -> dict:
     dois_to_process = found_dois[:10]
     
     async def process_dois(dois):
+        import redis.asyncio as aioredis
+        import json
+        redis_client = aioredis.from_url(settings.redis_url, decode_responses=True)
+        
         crossref = CrossrefClient()
         openalex = OpenAlexClient()
         results = []
         for doi in dois:
+            cache_key = f"doi_cache:{doi}"
+            cached = await redis_client.get(cache_key)
+            if cached:
+                try:
+                    results.append(json.loads(cached))
+                    continue
+                except Exception as e:
+                    logger.warning(f"Failed to parse Redis cache for {doi}: {e}")
+            
             # 1. Verify with Crossref
             cr_res = await crossref.verify_doi(doi)
             if not cr_res:
@@ -357,10 +370,18 @@ def enrich_references_task(self, task_id: str, text: str) -> dict:
             # 2. Get stats from OpenAlex
             oa_res = await openalex.get_work_by_doi(doi)
             
-            results.append({
+            result = {
                 "crossref": cr_res,
                 "openalex": oa_res,
-            })
+            }
+            results.append(result)
+            
+            # Cache for 30 days
+            try:
+                await redis_client.setex(cache_key, 86400 * 30, json.dumps(result))
+            except Exception as e:
+                logger.warning(f"Failed to write to Redis cache for {doi}: {e}")
+                
             # Be polite to rate limits
             await asyncio.sleep(0.5)
         return results

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class OpenAlexClient:
     """Async client for the OpenAlex REST API."""
 
-    def __init__(self, timeout: float = 15.0):
+    def __init__(self, timeout: float = 5.0):
         self.timeout = timeout
         self.base_url = "https://api.openalex.org"
         self.headers = {"User-Agent": "JournaBuddy/2.0 (mailto:admin@journabuddy.local)"}

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class CrossrefClient:
     """Async client for the Crossref REST API."""
 
-    def __init__(self, timeout: float = 10.0):
+    def __init__(self, timeout: float = 5.0):
         self.timeout = timeout
         self.base_url = "https://api.crossref.org/works"
         # Provide a mailto header as requested by Crossref polite pool guidelines
