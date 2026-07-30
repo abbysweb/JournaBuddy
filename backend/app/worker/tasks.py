@@ -477,8 +477,12 @@ def match_journals_task(self, task_id: str) -> dict:
     Session = sessionmaker(bind=engine)
     db = Session()
     try:
+        from app.models.models import Task
+        task_row = db.query(Task).filter(Task.id == uuid.UUID(task_id)).first()
+        payload = dict(task_row.dashboard_payload) if task_row and task_row.dashboard_payload else {}
+
         matcher = JournalMatcher(db)
-        matches = matcher.find_matching_journals(uuid.UUID(task_id), top_k=5)
+        matches = matcher.find_matching_journals(uuid.UUID(task_id), top_k=5, payload=payload)
         
         # Save to ProvenanceLog
         from app.models.models import ProvenanceLog
