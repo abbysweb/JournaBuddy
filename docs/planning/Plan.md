@@ -210,7 +210,7 @@ CREATE TABLE journals (
 * [x] Build Grafana monitoring dashboards.
 * [x] Implement JWT Authentication and rate-limiting using `slowapi`.
 * [x] Create GitHub Actions for automated testing and nightly benchmarking updates.
-* [ ] Create Phase 5 test cases in `/test_cases/phase_5_verification.md`.
+* [x] Create Phase 5 test cases in `/test_cases/phase_5_verification.md`.
 
 ---
 
