@@ -47,8 +47,9 @@ JournaBuddy is an artificial intelligence platform designed to help scientific a
 Instead of guessing whether a manuscript will be rejected due to poor formatting, weak citations, or out-of-scope journal selection, JournaBuddy runs automated checks that evaluate the paper across three core layers:
 \begin{enumerate}[leftmargin=*]
     \item \textbf{Symbolic / Rule-Based Layer:} Checks exact facts (structure, acronym definitions, citation formatting).
-    \item \textbf{Mathematical NLP Layer:} Calculates strict, rigorous text scores (Shannon Entropy, Simpson's Diversity, Coleman-Liau Index, TF-IDF).
+    \item \textbf{Mathematical NLP Layer:} Calculates strict, rigorous text scores (Shannon Entropy, SMOG Index, MATTR, Simpson's Diversity, Coleman-Liau Index).
     \item \textbf{Semantic / AI Layer:} Uses local LLM agents and pgvector search to evaluate methodology, journal scope fit, and cross-reference internal plagiarism.
+    \item \textbf{Machine Learning Layer:} Uses an XGBoost Ensemble predictor and SHAP Explainability to predict and justify acceptance likelihoods.
 \end{enumerate}
 
 \bigskip
@@ -230,11 +231,11 @@ Think of it like a priority calling list: the system first calls your local AI (
 \subsection*{Symbolic Checker \& Mathematical NLP}
 Upgraded from fragile heuristics to rigorous Information Theory models:
 \begin{enumerate}[leftmargin=*]
-    \item \textbf{Vocabulary Repetition:} Calculates Simpson's Diversity Index ($1 - \sum (n / N)^2$).
-    \item \textbf{Redundancy/Plagiarism Check:} Uses Jaccard Similarity to compare Introduction vs. Conclusion overlap.
     \item \textbf{Information Density:} Calculates Shannon Entropy (bits per word) for true vocabulary richness.
-    \item \textbf{Readability:} Utilizes the PDF-safe Coleman-Liau Index based entirely on character/word ratios.
-    \item \textbf{Keyword Extraction:} Mathematically derives primary keywords using Term Frequency (TF).
+    \item \textbf{Advanced Readability (SMOG \& Gunning Fog):} The academic gold standards for measuring the true complexity of scientific text.
+    \item \textbf{Vocabulary Richness (MATTR):} A sliding-window Moving-Average Type-Token Ratio that mathematically proves vocabulary diversity regardless of document length.
+    \item \textbf{Vocabulary Repetition:} Calculates Simpson's Diversity Index ($1 - \sum (n / N)^2$).
+    \item \textbf{Redundancy Check:} Uses Jaccard Similarity to compare Introduction vs. Conclusion overlap.
 \end{enumerate}
 
 \subsection*{ProvenanceEngine}
@@ -326,8 +327,8 @@ The Celery NLP pipeline concurrently launches three highly specialized Llama 3.1
     \item \textbf{Academic Style Editor (Group F3):} Audits the text for passive voice overuse, readability, and academic jargon clarity.
 \end{enumerate}
 
-\subsection*{8.2 Journal Acceptance Predictor (Logistic Regression)}
-The system replaces naive percentage guessing with a rigorous \textbf{Logistic Regression Sigmoid Algorithm} ($P = 1 / (1 + e^{-z})$). It dynamically predicts Acceptance Likelihood by weighting semantic compatibility (40\%), AI Methodological Rigor (30\%), Language Density (15\%), and Novelty (15\%).
+\subsection*{8.2 XGBoost Ensemble Predictor \& SHAP Explainability}
+The system replaces naive logistic regression with a rigorous \textbf{XGBoost Ensemble Predictor} trained on a synthetically bootstrapped dataset. To ensure mathematical transparency, it utilizes a \textbf{SHAP TreeExplainer} (SHapley Additive exPlanations) to calculate the exact percentage point impact each feature (e.g., Novelty, Journal Fit, Info Density) had on the final Acceptance score.
 
 \subsection*{8.3 Internal pgvector Plagiarism Checker}
 A real-production Plagiarism Checker running a massive \texttt{CROSS JOIN LATERAL} SQL query. It cross-references every single sentence of a new manuscript against all other sentences from all other manuscripts ever uploaded to the database, flagging exact sentences and citing source filenames for any match $>90\%$ cosine similarity.
@@ -339,12 +340,13 @@ A microservice utilizing the \texttt{reportlab} engine exposes a \texttt{GET /ap
     \item Massive Red Plagiarism Alert Violations
     \item 3-Persona AI Peer Review Feedback (rendered via 5-Axis Vector Radar Charts)
     \item Ranked Target Journal Matches (rendered via Vector Bar Charts)
+    \item XGBoost Acceptance Prediction \& SHAP Feature Explainability Table
 \end{itemize}
 
 \vspace{0.5cm}
 \begin{tcolorbox}[colback=blue!5,colframe=blue!40!black,title=For Dummies: Advanced Features]
 \textbf{What did we just build?} \\
-We turned JournaBuddy into a complete AI academic board. We replaced grade-school grammar checks with hardcore mathematical formulas. We added a built-in Plagiarism Checker that catches stolen sentences. We built a mathematical crystal ball (Logistic Regression) to predict journal acceptance rates. And finally, we print all of this into a stunning PDF certificate full of dynamic, beautifully drawn charts!
+We turned JournaBuddy into a complete AI academic board. We replaced grade-school grammar checks with hardcore mathematical formulas (like SMOG and MATTR). We built a synthetic data generator to train an XGBoost machine learning model that predicts journal acceptance rates, and we use SHAP to explain exactly *why* it gave that score. And finally, we print all of this into a stunning PDF certificate full of dynamic, beautifully drawn charts!
 \end{tcolorbox}
 
 \bigskip
