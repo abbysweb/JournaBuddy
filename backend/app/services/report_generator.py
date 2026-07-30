@@ -100,7 +100,7 @@ class ReportGenerator:
         elements.append(Paragraph("Manuscript Intelligence & Evaluation Certificate", title_style))
         
         elements.append(Spacer(1, 50))
-        elements.append(Paragraph(f"<b>Original File:</b> {task.original_filename}", subtitle_style))
+        elements.append(Paragraph(f"<b>Original File:</b> {task.filename}", subtitle_style))
         elements.append(Paragraph(f"<b>Evaluation ID:</b> {task_id}", subtitle_style))
         
         date_str = datetime.datetime.now().strftime("%B %d, %Y - %H:%M UTC")
