@@ -90,7 +90,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             </span>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Mathematical evaluation of text complexity based on Flesch-Kincaid and symbolic grammar rules.
+            Mathematical evaluation of text complexity based on Flesch-Kincaid and symbolic grammar rules.<br/>
+            <span style={{ opacity: 0.8 }}><strong>Note:</strong> A standard academic paper scores between 0 and 30. Negative scores (e.g., -600) indicate extreme edge cases caused by unparsed data tables, reference blocks, or missing punctuation in the PDF extraction.</span>
           </p>
           <ReactECharts option={readabilityOptions} style={{ height: '250px' }} theme="dark" opts={{ renderer: 'svg' }} />
         </div>
@@ -105,7 +106,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
             </span>
           </div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Journals statistically most likely to accept your manuscript based on semantic scope similarity.
+            Journals statistically most likely to accept your manuscript based on semantic scope similarity.<br/>
+            <span style={{ opacity: 0.8 }}><strong>Compatibility %:</strong> Derived from the mathematical cosine distance between your paper's AI embeddings and the journal's published topics. Higher is a better match.</span>
           </p>
           <ReactECharts option={journalOptions} style={{ height: '250px' }} theme="dark" opts={{ renderer: 'svg' }} />
         </div>
