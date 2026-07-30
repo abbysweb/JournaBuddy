@@ -481,6 +481,17 @@ def match_journals_task(self, task_id: str) -> dict:
         task_row = db.query(Task).filter(Task.id == uuid.UUID(task_id)).first()
         payload = dict(task_row.dashboard_payload) if task_row and task_row.dashboard_payload else {}
 
+        # 1. Run Plagiarism Checker
+        from app.services.plagiarism_checker import PlagiarismChecker
+        plagiarism_checker = PlagiarismChecker(db)
+        plagiarism_report = plagiarism_checker.check_for_plagiarism(uuid.UUID(task_id))
+        payload["plagiarism_report"] = plagiarism_report
+        
+        # Save payload back to DB so the UI/PDF can see it
+        task_row.dashboard_payload = payload
+        db.commit()
+
+        # 2. Run Journal Matcher
         matcher = JournalMatcher(db)
         matches = matcher.find_matching_journals(uuid.UUID(task_id), top_k=5, payload=payload)
         

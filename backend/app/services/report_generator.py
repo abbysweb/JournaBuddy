@@ -139,6 +139,41 @@ class ReportGenerator:
         date_str = datetime.datetime.now().strftime("%B %d, %Y - %H:%M UTC")
         elements.append(Paragraph(f"<b>Generated On:</b> {date_str}", subtitle_style))
         
+        # ==========================================
+        # PLAGIARISM ALERT
+        # ==========================================
+        plagiarism = payload.get("plagiarism_report", [])
+        if plagiarism:
+            elements.append(Spacer(1, 20))
+            alert_style = ParagraphStyle(
+                name='PlagiarismAlert',
+                parent=styles['Heading2'],
+                fontSize=16,
+                textColor=colors.HexColor("#ef4444"),
+                alignment=TA_CENTER,
+                spaceAfter=10
+            )
+            elements.append(Paragraph("CRITICAL PLAGIARISM ALERT", alert_style))
+            
+            p_data = [["Source Filename", "Similarity", "Plagiarized Line"]]
+            for p in plagiarism[:3]: # Show top 3 violations
+                source = p.get('source_filename', 'Unknown')
+                sim = f"{p.get('similarity_score', 0)}%"
+                line = p.get('plagiarized_text', '')[:100] + "..."
+                p_data.append([source, sim, line])
+                
+            p_table = Table(p_data, colWidths=[120, 80, 250])
+            p_table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#dc2626")),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+                ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0,1), (-1,-1), colors.HexColor("#fef2f2")),
+                ('GRID', (0,0), (-1,-1), 1, colors.HexColor("#f87171"))
+            ]))
+            elements.append(p_table)
+            elements.append(Spacer(1, 20))
+            
         elements.append(PageBreak())
         
         # ==========================================
