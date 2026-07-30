@@ -50,12 +50,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
     }]
   };
 
-  const matches = payload.match_task ? [
-    { title: "Cell", score: 20.7 },
-    { title: "Scientific Reports", score: 12.7 },
-    { title: "PLOS ONE", score: 7.0 },
-    { title: "IEEE Access", score: 4.8 },
-  ] : [];
+  const matches = Array.isArray(payload.journal_matches) ? payload.journal_matches : [];
 
   const journalOptions = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
@@ -74,7 +69,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ payload }) => {
     series: [{
       name: 'Compatibility',
       type: 'bar',
-      data: matches.map(m => m.score).reverse(),
+      data: matches.map((m: any) => m.compatibility_percent || 0).reverse(),
       itemStyle: {
         borderRadius: [0, 4, 4, 0],
         color: {

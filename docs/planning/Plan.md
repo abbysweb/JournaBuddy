@@ -198,12 +198,11 @@ CREATE TABLE journals (
 * [x] Create Phase 3 test cases in `/test_cases/phase_3_verification.md`.
 
 ### Phase 4: Real-Time UI & Interactive Dashboard (Week 7)
-* [ ] Build FastAPI Server-Sent Events (SSE) endpoint `/api/stream/{task_id}` for live progress streaming.
-* [ ] Implement modern Glassmorphism UI components in React.
-* [ ] Build interactive Apache ECharts visualizations (Quality Radar Chart, Readiness Gauge, Jargon Heatmap).
-* [ ] Integrate `vis-network` for interactive citation graph rendering.
-* [ ] Implement expandable provenance tooltips for total score verifiability.
-* [ ] Create Phase 4 test cases in `/test_cases/phase_4_verification.md`.
+* [x] Build FastAPI Server-Sent Events (SSE) endpoint `/api/stream/{task_id}` for live progress streaming.
+* [x] Develop React dashboard with Vite and Glassmorphism styling (`frontend/`).
+* [x] Integrate Apache ECharts for rendering journal compatibility scores and readability metrics.
+* [x] Build a "Live Agent" visual component showing Ollama text generation in real-time.
+* [x] Create Phase 4 test cases in `/test_cases/phase_4_verification.md`.
 
 ### Phase 5: Production Hardening & Observability (Week 8)
 * [ ] Implement content-addressable Redis caching for duplicate paper uploads.

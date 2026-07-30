@@ -434,13 +434,32 @@ def finalize_analysis_task(self, results, task_id: str):
     Called automatically as a Celery chord callback when all LLM agents and 
     Phase 3 tasks (enrichment, matching) finish executing.
     """
-    from app.models.models import Task
+    from app.models.models import Task, ProvenanceLog
     task_uuid = uuid.UUID(task_id)
     db = _get_sync_db()
     
     try:
         task_row = db.query(Task).filter(Task.id == task_uuid).first()
         if task_row:
+            matches_log = db.query(ProvenanceLog).filter(
+                ProvenanceLog.task_id == task_uuid,
+                ProvenanceLog.metric_name == "journal_matches"
+            ).first()
+            
+            enrich_log = db.query(ProvenanceLog).filter(
+                ProvenanceLog.task_id == task_uuid,
+                ProvenanceLog.metric_name == "reference_enrichment"
+            ).first()
+
+            payload = dict(task_row.dashboard_payload) if task_row.dashboard_payload else {}
+            
+            if matches_log and matches_log.metric_value:
+                payload["journal_matches"] = matches_log.metric_value.get("matches", [])
+                
+            if enrich_log and enrich_log.metric_value:
+                payload["reference_enrichment"] = enrich_log.metric_value.get("enriched_references", [])
+                
+            task_row.dashboard_payload = payload
             task_row.status = "completed"
             task_row.progress_percent = 100
             db.commit()
