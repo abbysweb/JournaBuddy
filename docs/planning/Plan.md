@@ -205,11 +205,11 @@ CREATE TABLE journals (
 * [x] Create Phase 4 test cases in `/test_cases/phase_4_verification.md`.
 
 ### Phase 5: Production Hardening & Observability (Week 8)
-* [ ] Implement content-addressable Redis caching for duplicate paper uploads.
-* [ ] Setup Prometheus metrics scraping for token usage, latency, and memory consumption.
-* [ ] Build Grafana monitoring dashboards.
-* [ ] Implement JWT Authentication and rate-limiting using `slowapi`.
-* [ ] Create GitHub Actions for automated testing and nightly benchmarking updates.
+* [x] Implement content-addressable Redis caching for duplicate paper uploads.
+* [x] Setup Prometheus metrics scraping for token usage, latency, and memory consumption.
+* [x] Build Grafana monitoring dashboards.
+* [x] Implement JWT Authentication and rate-limiting using `slowapi`.
+* [x] Create GitHub Actions for automated testing and nightly benchmarking updates.
 * [ ] Create Phase 5 test cases in `/test_cases/phase_5_verification.md`.
 
 ---

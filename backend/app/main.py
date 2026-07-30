@@ -8,8 +8,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api import upload, task
+from app.core.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +57,13 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+# ── Rate Limiting ──
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# ── Prometheus Metrics ──
+Instrumentator().instrument(app).expose(app)
 
 # ── CORS Middleware ──
 # In production, replace '*' with the actual frontend origin

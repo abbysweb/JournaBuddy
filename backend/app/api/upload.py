@@ -9,8 +9,10 @@ Endpoints:
 import os
 import uuid
 import logging
+import hashlib
+import redis.asyncio as aioredis
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 import boto3
 from botocore.exceptions import ClientError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,12 +21,15 @@ from fastapi import Depends
 from app.core.config import settings
 from app.db.session import get_db
 from app.schemas.schemas import UploadResponse
+from app.core.rate_limit import limiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Maximum allowed upload size: 50 MB
 MAX_FILE_SIZE = 50 * 1024 * 1024
+
+redis_client = aioredis.from_url(settings.redis_url, decode_responses=True)
 
 
 def _get_s3_client():
@@ -48,7 +53,9 @@ def _ensure_bucket(s3_client) -> None:
 
 
 @router.post("/upload", response_model=UploadResponse, summary="Upload PDF for Analysis")
+@limiter.limit("5/minute")
 async def upload_file(
+    request: Request,
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
@@ -94,6 +101,21 @@ async def upload_file(
             },
         )
 
+    # ── Redis Caching for Duplicates ──
+    file_hash = hashlib.sha256(file_content).hexdigest()
+    try:
+        cached_task_id = await redis_client.get(f"doc_hash:{file_hash}")
+        if cached_task_id:
+            logger.info(f"Duplicate PDF detected (hash={file_hash}). Returning cached task: {cached_task_id}")
+            return UploadResponse(
+                task_id=cached_task_id,
+                filename=file.filename,
+                status="queued",
+                message="PDF matched existing record. Returning cached analysis.",
+            )
+    except Exception as e:
+        logger.warning(f"Redis cache read failed: {e}")
+
     task_id = str(uuid.uuid4())
     object_key = f"{task_id}/{file.filename}"
 
@@ -131,6 +153,12 @@ async def upload_file(
         db.add(task_row)
         await db.commit()
         logger.info(f"Created task record: {task_id}")
+        # Cache the task_id by file hash for 30 days
+        try:
+            await redis_client.setex(f"doc_hash:{file_hash}", 86400 * 30, task_id)
+        except Exception as e:
+            logger.warning(f"Redis cache write failed: {e}")
+
     except Exception as e:
         logger.error(f"DB task creation failed: {e}")
         raise HTTPException(
